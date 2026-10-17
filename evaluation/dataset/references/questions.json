@@ -1,0 +1,81 @@
+[
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna zatvora za krađu?",
+    "expected_answer": "Do tri godine.",
+    "article": "228 (1)"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za krađu male vrijednosti?",
+    "expected_answer": "Do jedne godine.",
+    "article": "228 (2)"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za krađu velike vrijednosti?",
+    "expected_answer": "Od šest mjeseci do pet godina.",
+    "article": "228 (3)"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna zatvora za ubojstvo?",
+    "expected_answer": "Najmanje pet godina.",
+    "article": "110"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za teško ubojstvo?",
+    "expected_answer": "Najmanje deset godina ili dugotrajni zatvor.",
+    "article": "111"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za osnovni oblik razbojništva?",
+    "expected_answer": "Od jedne do deset godina.",
+    "article": "230 (1)"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za razbojništvo uz uporabu oružja?",
+    "expected_answer": "Od tri do dvanaest godina.",
+    "article": "230 (2)"
+  },
+  {
+    "document": "pdf/prometni_zakon_izvadak.pdf",
+    "question": "Koje je opće ograničenje brzine u naselju?",
+    "expected_answer": "50 km/h, ako prometnim znakom nije drukčije određeno.",
+    "article": "53 (1)"
+  },
+  {
+    "document": "pdf/prometni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za prekoračenje brzine u naselju za više od 50 km/h?",
+    "expected_answer": "1.320 do 2.650 eura ili zatvor do 60 dana.",
+    "article": "53 (3)"
+  },
+  {
+    "document": "pdf/prometni_zakon_izvadak.pdf",
+    "question": "Smije li mladi vozač voziti s alkoholom u krvi?",
+    "expected_answer": "Ne.",
+    "article": "199 (1)"
+  },
+  {
+    "document": "pdf/prometni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za vožnju s više od 1,50 g/kg alkohola?",
+    "expected_answer": "1.320 do 2.650 eura ili zatvor do 60 dana.",
+    "article": "199 (8)"
+  },
+  {
+    "document": "pdf/prometni_zakon_izvadak.pdf",
+    "question": "Kolika je kazna za 0,50 do 1,00 g/kg alkohola?",
+    "expected_answer": "Za više od 0,50 do 1,00 g/kg: 390 do 660 eura.",
+    "article": "199 (6)"
+  },
+  {
+    "document": "pdf/kazneni_zakon_izvadak.pdf",
+    "question": "Koliko godina zatvora predviđa Zakon za hakiranje bankomata?",
+    "expected_answer": "Nije navedeno u dostavljenom izvatku.",
+    "article": "not in source",
+    "type": "unanswerable"
+  }
+]

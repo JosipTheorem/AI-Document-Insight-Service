@@ -2,11 +2,19 @@ import os
 
 import httpx
 import streamlit as st
+from app_logging import log_event
+from config.settings import EXAMPLE_DATASET
 
 
 API_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 st.set_page_config(page_title="AI Document Insight", page_icon="\U0001f4ac")
 st.title("Razgovor s agentom")
+
+# A changed example corpus starts a fresh UI conversation instead of showing old facts.
+if st.session_state.get("example_dataset") != EXAMPLE_DATASET:
+    for key in ("api_session_id", "messages", "documents"):
+        st.session_state.pop(key, None)
+    st.session_state.example_dataset = EXAMPLE_DATASET
 
 
 def api_call(method, route, **kwargs):
@@ -15,12 +23,15 @@ def api_call(method, route, **kwargs):
         response.raise_for_status()
         return response.json()
     except httpx.HTTPStatusError as error:
+        log_event("ui_http_error", level="WARNING", interface="streamlit", path=route,  #logging
+                  status_code=error.response.status_code, request_id=error.response.headers.get("X-Request-ID"))
         try:
             detail = error.response.json().get("detail", "Zahtjev nije uspio.")
         except ValueError:
             detail = "Zahtjev nije uspio."
         raise RuntimeError(detail if isinstance(detail, str) else "Provjeri unesene podatke.") from error
     except httpx.RequestError as error:
+        log_event("ui_connection_error", level="ERROR", interface="streamlit", path=route, error_type=type(error).__name__)  #logging
         raise RuntimeError("Backend nije dostupan ili je zahtjev istekao. Provjeri je li API pokrenut.") from error
 
 
@@ -36,6 +47,9 @@ if "api_session_id" not in st.session_state:
         st.session_state.api_session_id = session["session_id"]
         st.session_state.documents = session["documents"]
         st.session_state.messages = []
+        st.session_state.messages_remaining = session["messages_remaining"]
+        st.session_state.messages_used = session["messages_used"]
+        st.session_state.session_notice = session["notice"]
     except RuntimeError as error:
         st.error(str(error))
         if st.button("Poku\u0161aj ponovno"):
@@ -43,6 +57,15 @@ if "api_session_id" not in st.session_state:
         st.stop()
 
 session_id = st.session_state.api_session_id
+if "messages_remaining" not in st.session_state:
+    try:
+        usage = api_call("GET", "/documents", params={"session_id": session_id})
+        st.session_state.messages_remaining = usage["messages_remaining"]
+        st.session_state.messages_used = usage["messages_used"]
+        st.session_state.session_notice = usage["notice"]
+    except RuntimeError as error:
+        st.error(str(error))
+        st.stop()
 with st.sidebar:
     st.subheader("Dokumenti")
     uploaded = st.file_uploader(
@@ -66,6 +89,7 @@ with st.sidebar:
         except RuntimeError as error:
             st.error(str(error))
     st.caption(f"Dokumenata u ovom razgovoru: {len(st.session_state.documents)}")
+    st.caption(f"Poruke u sesiji: {st.session_state.messages_used}/10")
     if st.session_state.documents:
         with st.expander("Dostupni dokumenti"):
             for document in st.session_state.documents:
@@ -75,7 +99,10 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-prompt = st.chat_input("Napi\u0161i poruku\u2026", submit_mode="disable", max_chars=2000)
+if st.session_state.session_notice:
+    st.info(st.session_state.session_notice)
+prompt = st.chat_input("Napi\u0161i poruku\u2026", submit_mode="disable", max_chars=2000,
+                       disabled=st.session_state.messages_remaining == 0)
 if prompt and prompt.strip():
     prompt = prompt.strip()
     with st.chat_message("user"):
@@ -89,5 +116,18 @@ if prompt and prompt.strip():
                 {"role": "user", "content": prompt},
                 {"role": "assistant", "content": result["answer"]},
             ])
+            st.session_state.messages_remaining = result["messages_remaining"]
+            st.session_state.messages_used = result["messages_used"]
+            st.session_state.session_notice = result["notice"]
+            st.rerun()
         except RuntimeError as error:
             st.error(str(error))
+            try:
+                usage = api_call("GET", "/documents", params={"session_id": session_id})
+                st.session_state.messages_remaining = usage["messages_remaining"]
+                st.session_state.messages_used = usage["messages_used"]
+                st.session_state.session_notice = usage["notice"]
+                if usage["notice"]:
+                    st.info(usage["notice"])
+            except RuntimeError:
+                pass

@@ -10,6 +10,7 @@ import pymupdf
 from PIL import Image, ImageOps
 
 from config.retrieval import CHUNK_WORDS, OVERLAP_WORDS
+from app_logging import timed
 
 pymupdf.no_recommend_layout()
 
@@ -96,6 +97,7 @@ def read_page(page):
     return dict(number=page.number + 1, raw=raw, blocks=column_order(blocks, page.rect.width), method=method, warnings=warnings)
 
 
+@timed("extraction_completed")  #logging
 def extract(path):
     path = Path(path)
     if path.suffix.lower() == ".pdf":
@@ -134,7 +136,18 @@ def make_chunks(pages, size=CHUNK_WORDS, overlap=OVERLAP_WORDS):
             else:
                 pending.append(raw)
         sections.append(("text", "\n\n".join(pending)))
+        # Keep a legal article/subsection with its own heading, instead of mixing penalties.
+        focused = []
         for kind, text in sections:
+            parts = re.split(r"(?m)(?=^Članak \d+\.|^Izvori i važna napomena)", text)
+            for part in parts:
+                if re.match(r"Članak \d+\.", part):
+                    heading, _, body = part.partition("\n")
+                    clauses = re.split(r"(?m)(?=^\(\d+\)\s)", body)
+                    focused.extend((kind, heading + "\n" + clause) for clause in clauses if clause.strip())
+                else:
+                    focused.append((kind, part))
+        for kind, text in focused:
             words = clean_text(text).split()
             for start in range(0, len(words), size - overlap):
                 chunks.append(dict(page_number=page["number"], text=" ".join(words[start:start + size]), kind=kind))

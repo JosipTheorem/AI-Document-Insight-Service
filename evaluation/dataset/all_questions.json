@@ -1,0 +1,221 @@
+{
+  "description": "Croatian legal TEST EXCERPTS: 2 topics, 6 files (native PDF/PNG/scanned PDF), 13 original questions. References are frozen before search, from the supplied answers and extracted source text, never generated from retrieval output. Not verified current legal advice.",
+  "cases": [
+    {
+      "id": "legal-01",
+      "question": "Kolika je kazna zatvora za krađu?",
+      "answerable": true,
+      "reference_index": 0,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 228. - Krađa (izvadak) (1) Za osnovni oblik krađe propisana je kazna zatvora do tri godine.",
+        "sha256": "b704db08300a1ffa0aecf64a8a2f08ae9090f49a6e72c81c69bff34a3ac36a5d"
+      },
+      "expected_answer": {
+        "article": "228 (1)",
+        "answer": "Do tri godine.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-02",
+      "question": "Kolika je kazna za krađu male vrijednosti?",
+      "answerable": true,
+      "reference_index": 1,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku.",
+        "sha256": "d6c884d73b5ba4cd1517b7e869fb4a52b972a1c02436a871225cd3a91e6a850c"
+      },
+      "expected_answer": {
+        "article": "228 (2)",
+        "answer": "Do jedne godine.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-03",
+      "question": "Kolika je kazna za krađu velike vrijednosti?",
+      "answerable": true,
+      "reference_index": 2,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 228. - Krađa (izvadak) (3) Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina.",
+        "sha256": "e92bcd5fb589e3a95301c414af15b7bf4c5e233e518c7da9c4405e9e07525d79"
+      },
+      "expected_answer": {
+        "article": "228 (3)",
+        "answer": "Od šest mjeseci do pet godina.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-04",
+      "question": "Kolika je kazna zatvora za ubojstvo?",
+      "answerable": true,
+      "reference_index": 3,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.",
+        "sha256": "b06a0ec1a777c7c68061dae7edb73629409ff0b227af1ccf2c28f5ad0c4e2e8b"
+      },
+      "expected_answer": {
+        "article": "110",
+        "answer": "Najmanje pet godina.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-05",
+      "question": "Kolika je kazna za teško ubojstvo?",
+      "answerable": true,
+      "reference_index": 4,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.",
+        "sha256": "eb803aeac2e64fc0c05b62b821fc28b7075ac5bbb9c494dcaedba97c1127141c"
+      },
+      "expected_answer": {
+        "article": "111",
+        "answer": "Najmanje deset godina ili dugotrajni zatvor.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-06",
+      "question": "Kolika je kazna za osnovni oblik razbojništva?",
+      "answerable": true,
+      "reference_index": 5,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 230. - Razbojništvo (izvadak) (1) Za osnovni oblik razbojništva propisana je kazna zatvora od jedne do deset godina.",
+        "sha256": "d6c7a36fcc033e5ed3a85235ba3a74c2dd29200001db9550adeeb47f3a44cc07"
+      },
+      "expected_answer": {
+        "article": "230 (1)",
+        "answer": "Od jedne do deset godina.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-07",
+      "question": "Kolika je kazna za razbojništvo uz uporabu oružja?",
+      "answerable": true,
+      "reference_index": 6,
+      "gold_chunk": {
+        "filename": "kazneni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 230. - Razbojništvo (izvadak) (2) Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.",
+        "sha256": "579d1baee1d06d42930acbf0b60bb8abfa74434cf3cc8619a8eaf2ebb8ba9c1e"
+      },
+      "expected_answer": {
+        "article": "230 (2)",
+        "answer": "Od tri do dvanaest godina.",
+        "source": "[kazneni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-08",
+      "question": "Koje je opće ograničenje brzine u naselju?",
+      "answerable": true,
+      "reference_index": 7,
+      "gold_chunk": {
+        "filename": "prometni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 53. - Brzina u naselju (izvadak) (1) Opće ograničenje brzine u naselju iznosi 50 km/h, osim ako prometni znak određuje drukčije.",
+        "sha256": "55d0146bd0f796a1392e1ca7ebef88570ed05a4c1af2fa4bb94a01a21f4f906d"
+      },
+      "expected_answer": {
+        "article": "53 (1)",
+        "answer": "50 km/h, ako prometnim znakom nije drukčije određeno.",
+        "source": "[prometni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-09",
+      "question": "Kolika je kazna za prekoračenje brzine u naselju za više od 50 km/h?",
+      "answerable": true,
+      "reference_index": 8,
+      "gold_chunk": {
+        "filename": "prometni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 53. - Brzina u naselju (izvadak) (3) Za više od 50 km/h iznad dopuštene brzine u naselju propisana je novčana kazna od 1.320 do 2.650 eura ili zatvor do 60 dana.",
+        "sha256": "f41c1699879b5967815f080a022bf38cf713f77fe794c264489e1c05eb58be71"
+      },
+      "expected_answer": {
+        "article": "53 (3)",
+        "answer": "1.320 do 2.650 eura ili zatvor do 60 dana.",
+        "source": "[prometni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-10",
+      "question": "Smije li mladi vozač voziti s alkoholom u krvi?",
+      "answerable": true,
+      "reference_index": 9,
+      "gold_chunk": {
+        "filename": "prometni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 199. - Alkohol i vožnja (izvadak) (1) Za mlade vozače, instruktore vožnje i navedene kategorije profesionalnih vozača vrijedi zabrana vožnje uz bilo kakav alkohol u krvi.",
+        "sha256": "02c86aca4645a1f37e18218f6d32a07a5579e0765671e7915cb5bbef88cd2b2a"
+      },
+      "expected_answer": {
+        "article": "199 (1)",
+        "answer": "Ne.",
+        "source": "[prometni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-11",
+      "question": "Kolika je kazna za vožnju s više od 1,50 g/kg alkohola?",
+      "answerable": true,
+      "reference_index": 10,
+      "gold_chunk": {
+        "filename": "prometni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 199. - Alkohol i vožnja (izvadak) (8) Za koncentraciju alkohola iznad 1,50 g/kg propisana je novčana kazna od 1.320 do 2.650 eura ili zatvor do 60 dana.",
+        "sha256": "421f8b20897e9f89da18bb2b0c3c88b364b4c9e28b3d384751486fd89e4ed1da"
+      },
+      "expected_answer": {
+        "article": "199 (8)",
+        "answer": "1.320 do 2.650 eura ili zatvor do 60 dana.",
+        "source": "[prometni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-12",
+      "question": "Kolika je kazna za 0,50 do 1,00 g/kg alkohola?",
+      "answerable": true,
+      "reference_index": 11,
+      "gold_chunk": {
+        "filename": "prometni_zakon_izvadak.pdf",
+        "page": 1,
+        "text": "Članak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.",
+        "sha256": "d393cb2ffbb48ee4c18e89a0b0baec33c1599956e4dec89fb01c0ae3873bf5d3"
+      },
+      "expected_answer": {
+        "article": "199 (6)",
+        "answer": "Za više od 0,50 do 1,00 g/kg: 390 do 660 eura.",
+        "source": "[prometni_zakon_izvadak.pdf, str. 1]"
+      }
+    },
+    {
+      "id": "legal-13",
+      "question": "Koliko godina zatvora predviđa Zakon za hakiranje bankomata?",
+      "answerable": false,
+      "reference_index": 12,
+      "gold_chunk": null,
+      "expected_answer": {
+        "article": "",
+        "answer": "Nije navedeno u dostavljenom izvatku.",
+        "source": ""
+      }
+    }
+  ]
+}

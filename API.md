@@ -5,6 +5,8 @@ Ollama mora biti pokrenuta. Iz korijena projekta pokreni backend u jednom termin
 ```powershell
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
+$documents = Get-ChildItem files/pdf/*.pdf, files/png/*.png
+python -m retrieval ingest @($documents.FullName)
 python -m uvicorn api:app --host 127.0.0.1 --port 8000
 ```
 
@@ -20,11 +22,14 @@ Streamlit: http://localhost:8501 · Interaktivna API dokumentacija: http://local
 Streamlit koristi isključivo HTTP za razgovor i upload. `API_BASE_URL` može
 promijeniti adresu backenda; zadana je `http://127.0.0.1:8000`.
 Terminalski agent i evaluacijski notebook nastavljaju raditi kao prije.
+Početni dokumenti su dva skraćena testna izvatka hrvatskih zakona u šest datoteka
+(tekstualni PDF, PNG i skenirani PDF). Izvori i dopuštenje uporabe su u
+`files/SOURCES.md`; to nisu cjeloviti službeni zakoni ni pravni savjet.
 
 ## Tijek
 
 1. Sučelje automatski poziva `POST /sessions` i dobiva nasumičan ID sesije.
-   Već indeksirani javni demo računi kopiraju se u njezin opseg bez ponovnog
+   Već indeksirani javni demo izvadci zakona kopiraju se u njezin opseg bez ponovnog
    embeddinga. API klijent može poslati `{"include_examples": false}` za praznu sesiju.
 2. **Obradi dokument** šalje PDF/PNG/JPEG kao multipart na `POST /upload`, uz
    `session_id`. Backend provjeri datoteku, spremi radnu kopiju, izdvoji tekst/OCR,
@@ -46,3 +51,11 @@ ne briše prethodne. Pogreška obrade ne uklanja već indeksirane dokumente.
 ostaju nakon restarta; povijest razgovora trenutačno je u memoriji backenda i
 resetira se njegovim restartom. **Novi razgovor** stvara zasebnu sesiju.
 Ovaj lokalni demo koristi ID sesije kao ključ pristupa, bez korisničkih računa/JWT-a.
+
+Sesija dopušta 10 poruka. Nakon desete sučelje traži novi razgovor; daljnji
+`/ask` vraća HTTP 429 bez pozivanja modela. Odgovori uključuju `messages_used`,
+`messages_remaining`, `message_limit` i `notice`. Security odbijanja i pokušaji
+koji završe greškom nakon prihvaćanja poruke također troše kvotu.
+
+Logovi su u `app_logging/logs/application.txt`. Za lokalni dashboard na portu
+8502 i objašnjenje metrika pogledaj `monitoring/NOTES.md`.

@@ -233,3 +233,9 @@ Desktop.ini
 
 # Local document index, original files and extraction previews
 /data/
+
+# Local structured event log read by the monitoring dashboard
+/app_logging/logs/
+
+# Local input archive; extracted knowledge files and provenance are tracked.
+/Croatian_Legal_Document_QA_Dataset.zip

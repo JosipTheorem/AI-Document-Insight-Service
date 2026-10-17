@@ -1,142 +1,144 @@
 {
-  "created_at": "2026-10-17T12:52:22.934339+00:00",
+  "created_at": "2026-10-17T16:37:31.797322+00:00",
   "agent_model": "qwen3.5:2b-q4_K_M",
   "judge_model": "qwen3.5:9b-q4_K_M",
   "embedding_model": "qwen3-embedding:0.6b",
   "session": "demo",
   "cases": [
     {
-      "id": "clean",
-      "question": "What is the total amount including VAT on invoice INV-2026-001?",
+      "id": "legal-01",
+      "question": "Kolika je kazna zatvora za krađu?",
+      "answerable": true,
       "queries": [
         {
-          "query": "invoice INV-2026-001 total amount including VAT"
-        },
-        {
-          "query": "INV-2026-001 total amount including VAT"
+          "query": "krajna kazna zatvora za krađu"
         }
       ],
       "passages": [
-        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.",
-        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+        "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (1) Za osnovni oblik krađe propisana je kazna zatvora do tri godine.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 229. - Teška krađa (izvadak) (1) Za opisane oblike teške krađe, uključujući krađu provaljivanjem, predviđena je kazna zatvora od šest mjeseci do pet godina, uz detaljne zakonske uvjete.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (3) Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina."
       ],
-      "answer": "```json\n{\"invoice_number\": \"INV-2026-001\", \"answer\": \"AED 63.00\", \"source\": \"[invoice-clean.pdf, str. 1]\"}\n```",
+      "answer": "{\"answer\": \"Za osnovni oblik krađe propisana je kazna zatvora do tri godine.\", \"article\": \"228 (1)\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": true,
-      "strict_json": false,
+      "strict_json": true,
       "judge": {
         "retrieval_ok": true,
-        "format_ok": false,
         "answer_ok": true,
-        "reason": "The search results contain the correct invoice (INV-2026-001) and the correct total amount (AED 63.00). However, the final_answer is wrapped in markdown code fences (```json ... ```), which violates the format_ok criterion requiring a raw JSON object without extra prose or fences."
+        "reason": "Rezultati pretraživanja sadrže točan članak 228 (1) s kaznom 'do tri godine' za osnovni oblik krađe, što odgovara referenci. Konačni odgovor ispravno citira taj izvor i podatak."
       },
-      "seconds": 11.2
+      "seconds": 8.5,
+      "gold_text_hit": true,
+      "abstained": false
     },
     {
-      "id": "multipage",
-      "question": "What is the total amount including VAT on invoice INV-2026-002?",
+      "id": "legal-05",
+      "question": "Kolika je kazna za teško ubojstvo?",
+      "answerable": true,
       "queries": [
         {
-          "query": "invoice INV-2026-002 total amount including VAT"
+          "query": "kazna za teško ubojstvo kazne"
         }
       ],
       "passages": [
-        "[invoice-multipage.pdf, str. 2]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 2 of 2 SKU Description Qty Unit Price Total SUP-MP-13 Ambient Grocery Item 13 2 EA 10.00 20.00 SUP-MP-14 Ambient Grocery Item 14 2 EA 10.00 20.00 SUP-MP-15 Ambient Grocery Item 15 2 EA 10.00 20.00 SUP-MP-16 Ambient Grocery Item 16 2 EA 10.00 20.00 SUP-MP-17 Ambient Grocery Item 17 2 EA 10.00 20.00 SUP-MP-18 Ambient Grocery Item 18 2 EA 10.00 20.00 SUP-MP-19 Ambient Grocery Item 19 2 EA 10.00 20.00 SUP-MP-20 Ambient Grocery Item 20 2 EA 10.00 20.00 Subtotal AED 400.00 VAT 5% AED 20.00 Total AED 420.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-multipage.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 1 of 2 SKU Description Qty Unit Price Total SUP-MP-01 Ambient Grocery Item 01 2 EA 10.00 20.00 SUP-MP-02 Ambient Grocery Item 02 2 EA 10.00 20.00 SUP-MP-03 Ambient Grocery Item 03 2 EA 10.00 20.00 SUP-MP-04 Ambient Grocery Item 04 2 EA 10.00 20.00 SUP-MP-05 Ambient Grocery Item 05 2 EA 10.00 20.00 SUP-MP-06 Ambient Grocery Item 06 2 EA 10.00 20.00 SUP-MP-07 Ambient Grocery Item 07 2 EA 10.00 20.00 SUP-MP-08 Ambient Grocery Item 08 2 EA 10.00 20.00 SUP-MP-09 Ambient Grocery Item 09 2 EA 10.00 20.00 SUP-MP-10 Ambient Grocery Item 10 2 EA 10.00 20.00 SUP-MP-11 Ambient Grocery Item 11 2 EA 10.00 20.00 SUP-MP-12 Ambient Grocery Item 12 2 EA 10.00 20.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+        "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura."
       ],
-      "answer": "```json\n{\"invoice_number\": \"INV-2026-002\", \"answer\": \"AED 420.00\", \"source\": \"[invoice-multipage.pdf, str. 2]\"}\n```",
+      "answer": "{\"answer\": \"Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\", \"article\": \"111\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": true,
-      "strict_json": false,
+      "strict_json": true,
       "judge": {
         "retrieval_ok": true,
-        "format_ok": false,
         "answer_ok": true,
-        "reason": "The retrieval contained the correct evidence (invoice-multipage.pdf page 2) showing the total amount of 420.00 AED for INV-2026-002. The answer is factually correct and cites the right source. However, format_ok is false because the final output includes markdown code fences ('```json' and '```') and extra whitespace/newlines, violating the requirement that the final answer be ONLY a raw JSON object."
+        "reason": "Pretraženi rezultati sadrže točan članak 111. iz Kaznenog zakona koji definira kaznu za teško ubojstvo kao najmanje deset godina ili dugotrajni zatvor. Odgovor se usklađuje s referentnim podacima i izvornim tekstom."
       },
-      "seconds": 5.7
+      "seconds": 10.4,
+      "gold_text_hit": true,
+      "abstained": false
     },
     {
-      "id": "discount",
-      "question": "How much is the line-1 discount on invoice INV-2026-009?",
+      "id": "legal-07",
+      "question": "Kolika je kazna za razbojništvo uz uporabu oružja?",
+      "answerable": true,
       "queries": [
         {
-          "query": "invoice INV-2026-009 line-1 discount"
+          "query": "razbojništvo uz uporabu oružja kazna"
         }
       ],
       "passages": [
-        "[invoice-discount.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-009 Date: 2026-08-09 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-YOG-500 Yoghurt 500g 20 EA 4.00 72.00 SUP-LAB-400 Labneh 400g 10 EA 6.00 60.00 Subtotal AED 132.00 Discount AED 8.00 VAT 5% AED 6.60 Total AED 138.60 Notes Line 1 carries an AED 8.00 (10%) discount. Subtotal is net of line discounts. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-discount.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-009 Date: 2026-08-09 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-YOG-500 Yoghurt 500g 20 EA 4.00 72.00 SUP-LAB-400 Labneh 400g 10 EA 6.00 60.00 Subtotal AED 132.00 Discount AED 8.00 VAT 5% AED 6.60 Total AED 138.60 Notes Line 1 carries an AED 8.00 (10%) discount. Subtotal is net of line discounts. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-multipage.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 1 of 2 SKU Description Qty Unit Price Total SUP-MP-01 Ambient Grocery Item 01 2 EA 10.00 20.00 SUP-MP-02 Ambient Grocery Item 02 2 EA 10.00 20.00 SUP-MP-03 Ambient Grocery Item 03 2 EA 10.00 20.00 SUP-MP-04 Ambient Grocery Item 04 2 EA 10.00 20.00 SUP-MP-05 Ambient Grocery Item 05 2 EA 10.00 20.00 SUP-MP-06 Ambient Grocery Item 06 2 EA 10.00 20.00 SUP-MP-07 Ambient Grocery Item 07 2 EA 10.00 20.00 SUP-MP-08 Ambient Grocery Item 08 2 EA 10.00 20.00 SUP-MP-09 Ambient Grocery Item 09 2 EA 10.00 20.00 SUP-MP-10 Ambient Grocery Item 10 2 EA 10.00 20.00 SUP-MP-11 Ambient Grocery Item 11 2 EA 10.00 20.00 SUP-MP-12 Ambient Grocery Item 12 2 EA 10.00 20.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+        "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (2) Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (1) Za osnovni oblik razbojništva propisana je kazna zatvora od jedne do deset godina.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku."
       ],
-      "answer": "```json\n{\"invoice_number\": \"INV-2026-009\", \"answer\": \"AED 8.00\", \"source\": \"[invoice-discount.pdf, str. 1]\"}\n```",
+      "answer": "{\"answer\": \"Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\", \"article\": \"230 (2)\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": true,
-      "strict_json": false,
+      "strict_json": true,
       "judge": {
         "retrieval_ok": true,
-        "format_ok": false,
         "answer_ok": true,
-        "reason": "The retrieval was successful as the relevant invoice (INV-2026-009) and discount details were found in the tool results. The answer is factually correct (AED 8.00). However, format_ok is false because the final output includes markdown code fences (```json ... ```) and newlines, violating the requirement for a raw JSON object without extra prose or formatting."
+        "reason": "Pretraženi rezultati sadrže točan izvod članka 230 stavak 2. koji definira kaznu za razbojništvo uz uporabu oružja kao zatvor od tri do dvanaest godina. Konačni odgovor ispravno citira taj članak, navodi točnu kaznu i referira na pravi izvor."
       },
-      "seconds": 3.4
+      "seconds": 10.5,
+      "gold_text_hit": true,
+      "abstained": false
     },
     {
-      "id": "case-pack",
-      "question": "How many individual cans are received for invoice INV-2026-012?",
+      "id": "legal-09",
+      "question": "Kolika je kazna za prekoračenje brzine u naselju za više od 50 km/h?",
+      "answerable": true,
       "queries": [
         {
-          "query": "invoice INV-2026-012 individual cans received"
+          "query": "kazna za prekoračenje brzine u naselju za više od 50 km/h"
         }
       ],
       "passages": [
-        "[invoice-case-pack.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-012 Date: 2026-08-12 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-WAT-330-CS Sparkling Water 330ml (12 × 330ml case) 5 CS 28.80 144.00 12 eaches / case· Shopify qty 60 Subtotal AED 144.00 VAT 5% AED 7.20 Total AED 151.20 Notes Billed as 5 cases. Each case contains 12 eaches. Shopify receiving quantity is 60 if the store tracks individual cans. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-case-pack.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-012 Date: 2026-08-12 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-WAT-330-CS Sparkling Water 330ml (12 × 330ml case) 5 CS 28.80 144.00 12 eaches / case · Shopify qty 60 Subtotal AED 144.00 VAT 5% AED 7.20 Total AED 151.20 Notes Billed as 5 cases. Each case contains 12 eaches. Shopify receiving quantity is 60 if the store tracks individu Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 53. - Brzina u naselju (izvadak) (3) Za više od 50 km/h iznad dopuštene brzine u naselju propisana je novčana kazna od 1.320 do 2.650 eura ili zatvor do 60 dana.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 53. - Brzina u naselju (izvadak) (4) Za više od 30 do 50 km/h iznad dopuštene brzine u naselju propisana je novčana kazna od 390 do 920 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 53. - Brzina u naselju (izvadak) (2) Na odgovarajućoj cesti prometnim znakom može se dopustiti najviše 80 km/h."
       ],
-      "answer": "```json\n{\"invoice_number\": \"INV-2026-012\", \"answer\": \"60 cans\", \"source\": \"[invoice-case-pack.png, str. 1]\"}\n```",
+      "answer": "{\"answer\": \"Za više od 50 km/h iznad dopuštene brzine u naselju propisana je novčana kazna od 1.320 do 2.650 eura ili zatvor do 60 dana.\", \"article\": \"53 (3)\", \"source\": \"[prometni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": true,
-      "strict_json": false,
+      "strict_json": true,
       "judge": {
         "retrieval_ok": true,
-        "format_ok": false,
         "answer_ok": true,
-        "reason": "The retrieval contains sufficient evidence in both the PNG and PDF chunks for invoice INV-2026-012. The answer is factually correct (60 cans), but format_ok is false because the final output includes markdown code fences (```json ... ```) and extra whitespace, violating the requirement for a raw JSON object."
+        "reason": "Pretraženi rezultati sadrže točan članak 53 stavak 3 koji definira kaznu za prekoračenje brzine iznad 50 km/h u naselju. Konačni odgovor ispravno navodi novčanu kaznu i zatvor te citira pravi članak i izvor iz pretraženih rezultata."
       },
-      "seconds": 3.1
+      "seconds": 9.0,
+      "gold_text_hit": true,
+      "abstained": false
     },
     {
-      "id": "scan",
-      "question": "What is the invoice date of INV-2026-014?",
+      "id": "legal-12",
+      "question": "Kolika je kazna za 0,50 do 1,00 g/kg alkohola?",
+      "answerable": true,
       "queries": [
         {
-          "query": "invoice date of INV-2026-014"
-        },
-        {
-          "query": "INV-2026-014 date"
+          "query": "kazna za 0,50 do 1,00 g/kg alkohola kazne"
         }
       ],
       "passages": [
-        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.",
-        "[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
       ],
-      "answer": "```json\n{\"invoice_number\": \"INV-2026-014\", \"answer\": \"2026-08-14\", \"source\": \"[invoice-scan.pdf, str. 1]\"}\n```",
+      "answer": "{\"answer\": \"Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\", \"article\": \"199 (6)\", \"source\": \"[prometni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": true,
-      "strict_json": false,
+      "strict_json": true,
       "judge": {
         "retrieval_ok": true,
-        "format_ok": false,
         "answer_ok": true,
-        "reason": "The actual tool results contain the correct invoice date (2026-08-14) for INV-2026-014 in multiple sources. However, format_ok is false because the final answer includes markdown code fences (```json ... ```) and newlines, violating the requirement that the output be ONLY a raw JSON object."
+        "reason": "Pretraženi rezultati sadrže točan izvod članka 199 (6) koji definira kaznu za koncentraciju između 0,50 i 1,00 g/kg. Konačni odgovor točno navodi traženu novčanu kaznu od 390 do 660 eura uz ispravan članak i izvor prisutan u rezultatima pretrage."
       },
-      "seconds": 4.4
+      "seconds": 10.2,
+      "gold_text_hit": true,
+      "abstained": false
     }
   ]
 }

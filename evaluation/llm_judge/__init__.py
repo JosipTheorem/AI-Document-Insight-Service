@@ -6,10 +6,10 @@ JUDGE_MODEL = "qwen3.5:9b-q4_K_M"
 JUDGE_SCHEMA = {
     "type": "object",
     "properties": {
-        **{key: {"type": "boolean"} for key in ("retrieval_ok", "format_ok", "answer_ok")},
+        **{key: {"type": "boolean"} for key in ("retrieval_ok", "answer_ok")},
         "reason": {"type": "string"},
     },
-    "required": ["retrieval_ok", "format_ok", "answer_ok", "reason"],
+    "required": ["retrieval_ok", "answer_ok", "reason"],
     "additionalProperties": False,
 }
 

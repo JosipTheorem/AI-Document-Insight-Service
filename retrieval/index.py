@@ -15,9 +15,10 @@ from ollama import Client
 
 from config.retrieval import (
     BATCH_SIZE, CANDIDATES, DATABASE, DOCUMENT_SESSION, EMBEDDING_MODEL,
-    OLLAMA_URL, PIPELINE_ID, RRF_K,
+    OLLAMA_URL, PIPELINE_ID, RRF_K, RRF_WEIGHTS,
 )
 from retrieval.documents import clean_text, extract, make_chunks
+from app_logging import timed
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS index_meta (id INTEGER PRIMARY KEY CHECK(id=1), model_id TEXT NOT NULL, dimension INTEGER NOT NULL);
@@ -57,11 +58,11 @@ def keywords(query):
     return " OR ".join(f'"{t}"' for t in terms if t not in STOP_WORDS and (len(t) > 1 or t.isdigit()))
 
 
-def rrf(*rankings, k=RRF_K):
+def rrf(*rankings, k=RRF_K, weights=None):
     scores = defaultdict(float)
-    for ranking in rankings:
+    for ranking, weight in zip(rankings, weights or [1] * len(rankings), strict=True):
         for rank, chunk_id in enumerate(dict.fromkeys(ranking), 1):
-            scores[chunk_id] += 1 / (k + rank)
+            scores[chunk_id] += weight / (k + rank)
     return sorted(scores, key=lambda chunk_id: (-scores[chunk_id], chunk_id)), scores
 
 
@@ -101,6 +102,7 @@ class Index:
                 return f"{EMBEDDING_MODEL}@{model.digest}"
         raise ValueError(f"Run: ollama pull {EMBEDDING_MODEL}")
 
+    @timed("embedding_completed")  #logging
     def embed(self, texts, query=False):
         if query:
             texts = [f"Instruct: Given a question, retrieve relevant document passages that answer the question\nQuery: {t}" for t in texts]
@@ -155,6 +157,7 @@ class Index:
         return dict(status="indexed", document_id=document_id, filename=path.name, pages=len(pages), chunks=len(chunks),
                     warnings=[note for page in pages for note in page["warnings"]])
 
+    @timed("search_completed")  #logging
     def search(self, query, session_id=DOCUMENT_SESSION, top_k=5, document_ids=None):
         query = query.strip()
         if not query or len(query) > 2000 or not 1 <= top_k <= 20 or not session_id.strip():
@@ -185,11 +188,17 @@ class Index:
         lexical_scores = dict(lexical)
         lexical_ranks = {row[0]: rank for rank, row in enumerate(lexical, 1)}
         vector_ranks = {chunk_id: rank for rank, chunk_id in enumerate(semantic, 1)}
-        ranked, scores = rrf(list(lexical_scores), semantic)
+        ranked, scores = rrf(list(lexical_scores), semantic, weights=RRF_WEIGHTS)
+        # PDF/PNG/scan variants can contain identical passages; keep room for other evidence.
+        seen, distinct = set(), []
+        for chunk_id in ranked:
+            if rows[chunk_id]["text"] not in seen:
+                seen.add(rows[chunk_id]["text"])
+                distinct.append(chunk_id)
         return [dict(chunk_id=i, document_id=rows[i]["document_id"], filename=rows[i]["filename"],
                      page_number=rows[i]["page_number"], text=rows[i]["text"], kind=rows[i]["kind"], rrf_score=scores[i],
                      lexical_rank=lexical_ranks.get(i), vector_rank=vector_ranks.get(i),
-                     bm25=lexical_scores.get(i), cosine_similarity=cosine[i]) for i in ranked[:top_k]]
+                     bm25=lexical_scores.get(i), cosine_similarity=cosine[i]) for i in distinct[:top_k]]
 
     def copy_documents(self, source_session, target_session, content_hashes):
         """Reuse indexed demo documents in a new scope without another embedding run."""

@@ -1,6 +1,7 @@
 """Offline checks: python -m unittest discover -s tests -v."""
 
 import tempfile
+import os
 import unittest
 from io import BytesIO
 from pathlib import Path
@@ -22,7 +23,7 @@ def page(text, number=1, kind="text"):
 
 
 def fake_embeddings(texts, query=False):
-    return np.array([[1, 0, 0] if "invoice" in t.lower() or "payment" in t.lower()
+    return np.array([[1, 0, 0] if "penalty" in t.lower() or "punishment" in t.lower()
                      else [0, 1, 0] for t in texts], dtype=np.float32)
 
 
@@ -41,11 +42,11 @@ class ProcessingTests(unittest.TestCase):
         self.assertTrue(set(words).issubset(set(" ".join(c["text"] for c in chunks).split())))
 
     def test_numbered_ocr_rules_keep_title_and_separate_facts(self):
-        chunks = make_chunks([page("Etiquette\n1. Phone away.\n2. Listen first.\n3. Respect others.", kind="ocr")])
+        chunks = make_chunks([page("Traffic rules\n1. Speed limit.\n2. Alcohol limit.\n3. Seat belt.", kind="ocr")])
         self.assertEqual(len(chunks), 3)
-        self.assertTrue(all("Etiquette" in c["text"] for c in chunks))
-        self.assertIn("Phone", chunks[0]["text"])
-        self.assertNotIn("Listen", chunks[0]["text"])
+        self.assertTrue(all("Traffic rules" in c["text"] for c in chunks))
+        self.assertIn("Speed", chunks[0]["text"])
+        self.assertNotIn("Alcohol", chunks[0]["text"])
 
     def test_columns_are_not_interleaved(self):
         blocks = [(pymupdf.Rect(box), ("text", text)) for box, text in [
@@ -54,6 +55,20 @@ class ProcessingTests(unittest.TestCase):
             ((310, 140, 550, 180), "right2")]]
         self.assertEqual([text for _, text in column_order(blocks, 600)],
                          ["heading", "left1", "left2", "right1", "right2"])
+
+    def test_legal_subsections_keep_article_and_do_not_mix_penalties(self):
+        text = ("Članak 228. - Krađa\n(1) Osnovni oblik: do tri godine.\n"
+                "(2) Mala vrijednost: do jedne godine.\n"
+                "Članak 230. - Razbojništvo\n(1) Od jedne do deset godina.\n"
+                "Izvori i važna napomena\nOvo je testni izvadak.")
+        for kind in ("text", "ocr"):
+            chunks = make_chunks([page(text, kind=kind)])
+            theft = [c["text"] for c in chunks if c["text"].startswith("Članak 228.")]
+            self.assertEqual(len(theft), 2)
+            self.assertIn("(1) Osnovni oblik: do tri godine.", theft[0])
+            self.assertNotIn("Mala vrijednost", theft[0])
+            self.assertNotIn("Razbojništvo", " ".join(theft))
+            self.assertFalse(any("Izvori" in c["text"] for c in chunks if c["text"].startswith("Članak")))
 
     def test_real_pdf_table_preserves_column_labels(self):
         with pymupdf.open() as document:
@@ -88,7 +103,10 @@ class ProcessingTests(unittest.TestCase):
         self.assertEqual(ranked, [20, 10, 30])
         self.assertAlmostEqual(scores[20], 2 / 62)
         self.assertAlmostEqual(scores[10], 1 / 61)
-        self.assertEqual(keywords('invoice: "ABC-123" OR (shoes*)'), '"invoice" OR "abc" OR "123" OR "shoes"')
+        _, weighted = rrf([10, 20], [30, 20], weights=(1, 2))
+        self.assertAlmostEqual(weighted[20], 3 / 62)
+        self.assertGreater(weighted[30], weighted[10])
+        self.assertEqual(keywords('penalty: "ABC-123" OR (shoes*)'), '"penalty" OR "abc" OR "123" OR "shoes"')
 
 
 class IndexTests(unittest.TestCase):
@@ -96,6 +114,7 @@ class IndexTests(unittest.TestCase):
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)
+        self.enterContext(patch.dict(os.environ, {"APP_LOG_FILE": str(self.root / "events.txt")}))
         self.index = Index(self.root / "index.sqlite3")
         self.index.model_id = "test-model@v1"
         self.index.embed = Mock(side_effect=fake_embeddings)
@@ -104,7 +123,7 @@ class IndexTests(unittest.TestCase):
         extractor.start()
         self.addCleanup(extractor.stop)
 
-    def ingest(self, name="invoice.pdf", text="Invoice payment within 30 days.", session="alice", force=False):
+    def ingest(self, name="penalty.pdf", text="Penalty punishment within 30 days.", session="alice", force=False):
         path = self.root / name
         path.write_text(text)
         return self.index.ingest(path, session, force)
@@ -115,27 +134,36 @@ class IndexTests(unittest.TestCase):
         self.assertEqual(self.index.embed.call_count, 1)
         restarted = Index(self.index.path)
         restarted.model_id, restarted.embed = self.index.model_id, self.index.embed
-        self.assertIn("30 days", restarted.search("payment", "alice")[0]["text"])
-        self.assertEqual(restarted.inspect(document["document_id"], 1, "alice")["raw_text"], "Invoice payment within 30 days.")
+        self.assertIn("30 days", restarted.search("punishment", "alice")[0]["text"])
+        self.assertEqual(restarted.inspect(document["document_id"], 1, "alice")["raw_text"], "Penalty punishment within 30 days.")
 
     def test_sessions_and_document_filters_apply_to_both_searches(self):
-        self.ingest("secret.pdf", "Invoice payment secret\f" * 40, "bob")
+        self.ingest("secret.pdf", "Penalty punishment secret\f" * 40, "bob")
         own = self.ingest()
-        hit = self.index.search("invoice payment", "alice", top_k=1)[0]
+        hit = self.index.search("penalty punishment", "alice", top_k=1)[0]
         self.assertEqual(hit["document_id"], own["document_id"])
         self.assertEqual((hit["lexical_rank"], hit["vector_rank"]), (1, 1))
         self.assertNotIn("secret", hit["text"])
-        self.assertEqual(self.index.search("invoice", "bob", document_ids=[own["document_id"]]), [])
-        self.assertEqual(self.index.search("invoice", "alice", document_ids=[]), [])
-        self.assertEqual(self.index.search("invoice", "nobody"), [])
+        self.assertEqual(self.index.search("penalty", "bob", document_ids=[own["document_id"]]), [])
+        self.assertEqual(self.index.search("penalty", "alice", document_ids=[]), [])
+        self.assertEqual(self.index.search("penalty", "nobody"), [])
         with self.assertRaises(ValueError):
             self.index.inspect(own["document_id"], 1, "bob")
 
     def test_semantic_search_without_keyword_matches(self):
-        self.ingest(text="Invoice settlement within thirty days.")
-        hit = self.index.search("payment deadline", "alice", top_k=1)[0]
+        self.ingest(text="Penalty settlement within thirty days.")
+        hit = self.index.search("punishment deadline", "alice", top_k=1)[0]
         self.assertIsNone(hit["lexical_rank"])
         self.assertEqual(hit["vector_rank"], 1)
+
+    def test_identical_passages_do_not_crowd_out_other_evidence(self):
+        first = self.ingest("native.pdf", "Penalty up to three years.")
+        self.ingest("scan.pdf", "Penalty  up to three years.")
+        other = self.ingest("other.pdf", "Different penalty: up to one year.")
+        hits = self.index.search("penalty", "alice", top_k=3)
+        self.assertEqual(len(hits), 2)
+        self.assertEqual(len({hit["text"] for hit in hits}), 2)
+        self.assertTrue({first["document_id"], other["document_id"]}.issubset({h["document_id"] for h in hits}))
 
     def test_reindex_is_atomic_and_fts_has_no_duplicates(self):
         self.ingest()
@@ -145,7 +173,7 @@ class IndexTests(unittest.TestCase):
             self.ingest(force=True)
         with self.index.connection() as db:
             self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks").fetchone()[0], 1)
-            self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks_fts WHERE chunks_fts MATCH 'invoice'").fetchone()[0], 1)
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks_fts WHERE chunks_fts MATCH 'penalty'").fetchone()[0], 1)
             self.assertEqual(db.execute("PRAGMA foreign_key_check").fetchall(), [])
 
     def test_bad_inputs_and_model_mismatch_are_rejected(self):
@@ -154,26 +182,26 @@ class IndexTests(unittest.TestCase):
         self.ingest()
         self.index.model_id = "different-model"
         with self.assertRaises(ValueError):
-            self.index.search("invoice", "alice")
+            self.index.search("penalty", "alice")
         self.index.model_id = "test-model@v1"
         self.index.embed.side_effect = lambda *a, **k: [[float("nan"), 0, 1]]
         with self.assertRaises(ValueError):
-            self.index.search("invoice", "alice")
+            self.index.search("penalty", "alice")
         for query in ["", "x" * 2001]:
             with self.assertRaises(ValueError):
                 self.index.search(query, "alice")
 
     def test_fts_syntax_is_treated_as_text(self):
         self.ingest()
-        for query in ['invoice: (OR *)', '"', '--', 'AND NOT']:
+        for query in ['penalty: (OR *)', '"', '--', 'AND NOT']:
             self.index.search(query, "alice")
 
 
 class ToolTests(unittest.TestCase):
     @patch("tools.search_documents.tool._index")
     def test_tool_returns_sources_and_uses_the_configured_session(self, get_index):
-        get_index().search.return_value = [dict(filename="invoice.pdf", page_number=2, text="Total: 30 EUR", embedding="private")]
-        self.assertEqual(search_documents("total"), "[invoice.pdf, str. 2]\nTotal: 30 EUR")
+        get_index().search.return_value = [dict(filename="penalty.pdf", page_number=2, text="Total: 30 EUR", embedding="private")]
+        self.assertEqual(search_documents("total"), "[penalty.pdf, str. 2]\nTotal: 30 EUR")
         get_index().search.assert_called_once_with("total", session_id=DOCUMENT_SESSION, top_k=3)
         get_index().search.side_effect = ConnectionError("Ollama unavailable")
         self.assertIn("Document search failed", search_documents("total"))

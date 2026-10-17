@@ -12,4 +12,5 @@ OLLAMA_URL = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
 CHUNK_WORDS, OVERLAP_WORDS = 220, 35
 BATCH_SIZE, CANDIDATES, RRF_K = 8, 30, 60
-PIPELINE_ID = f"simple-v1:{CHUNK_WORDS}:{OVERLAP_WORDS}"
+RRF_WEIGHTS = (1, 2)  # BM25, vector: semantic matching handles Croatian word inflections.
+PIPELINE_ID = f"simple-v2-articles:{CHUNK_WORDS}:{OVERLAP_WORDS}"

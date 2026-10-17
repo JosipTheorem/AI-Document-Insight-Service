@@ -1,87 +1,98 @@
 [
   {
-    "file": "LICENSE",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/LICENSE",
-    "sha256": "6b9823c7bff7119b018575ffc00a8bba58d31cd2fa08b59e81287ea430c73bcb"
+    "file": "ORIGIN.md",
+    "archive_member": "README.md",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "0dd242bc61b1225b4abcdc796ea0f0adaa01117c6b1631bd6e16d698d9786dd9",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "CITATION.cff",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/CITATION.cff",
-    "sha256": "7b09d4a0f09b0adab6a37a195e615c700c3304da8e65e14db59301ebcad5c2ae"
+    "file": "png/kazneni_zakon_izvadak_stranica_1.png",
+    "archive_member": "images/kazneni_zakon_izvadak_stranica_1.png",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "c1502277370a679089e9fb6ca1ed6d60e016156df88fe4d2cdbb8518da030900",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "pdf/invoice-clean.pdf",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/01-simple-english/invoice.pdf",
-    "sha256": "b5f12eca341c9127b795c5d7d409102c7ae1b54fb735b516e62191694db78e3e"
+    "file": "png/prometni_zakon_izvadak_stranica_1.png",
+    "archive_member": "images/prometni_zakon_izvadak_stranica_1.png",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "83236530a6225a8861eadace3312e78d3c61de79ed676adbff8f7fcff59ab9a8",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "png/invoice-clean.png",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/01-simple-english/invoice.png",
-    "sha256": "68581821b13b5116512aa2eeafc50813992798acaf0af147b492b53130eed7c3"
+    "file": "pdf/kazneni_zakon_izvadak.pdf",
+    "archive_member": "pdf/kazneni_zakon_izvadak.pdf",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "bf04a24641431f563798bebdfd1f51e0b6e8f8cc9ae6d1ff9e912c913147590c",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "../evaluation/dataset/references/invoice-clean.expected.json",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/01-simple-english/expected.json",
-    "sha256": "edbf9fc702436139aec3d88ee94f0341ff32abf7d299fc1a1393a6ee4243c0c5"
+    "file": "pdf/prometni_zakon_izvadak.pdf",
+    "archive_member": "pdf/prometni_zakon_izvadak.pdf",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "e7a0a3579fdd75cf0b70bba874d0b03774e916a3846a7235dbd2bb4e836606d6",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "pdf/invoice-scan.pdf",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/14-poor-scan/invoice.pdf",
-    "sha256": "ec88276e93f0def96bbec7b2c8c026c4b1a2eb2e54ea83aee9ac7fbc8b3977a4"
+    "file": "../evaluation/dataset/references/questions.json",
+    "archive_member": "questions.json",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "f78ae9acc0196d2a849259bbea9ca16ed62904b1d9c957d72ff08effd96824f3",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "png/invoice-scan.png",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/14-poor-scan/invoice.png",
-    "sha256": "c57552a94f7ee3cd0a8647a8bd1a06652ad78667d9a2835d6ee73e57808a17ca"
+    "file": "pdf/kazneni_zakon_izvadak_scan.pdf",
+    "archive_member": "scanned_pdf/kazneni_zakon_izvadak_scan.pdf",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "8ab1adc23910f6df6c962ec2fc302831fd79c4bda3205eb256986369fdd7fc0d",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   },
   {
-    "file": "../evaluation/dataset/references/invoice-scan.expected.json",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/14-poor-scan/expected.json",
-    "sha256": "f54d658d37d02b818e95f3ae30d157d8492e4c87077650b7d0f0f6ae1cbb134f"
-  },
-  {
-    "file": "pdf/invoice-multipage.pdf",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/02-multipage/invoice.pdf",
-    "sha256": "f8bad76814d43ce9b3b14ecb9d2acd10f2bc27b336dc988276769fac98abad89"
-  },
-  {
-    "file": "png/invoice-multipage.png",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/02-multipage/invoice.png",
-    "sha256": "c42b472673c737c8bc3046049f2170a144c0a7774ded1577aac1fc2f53536f2f"
-  },
-  {
-    "file": "../evaluation/dataset/references/invoice-multipage.expected.json",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/02-multipage/expected.json",
-    "sha256": "69ac97ec300f521aad095cc7ac5e9fcd2cf8fb7f13114de117d4c591d808a8bc"
-  },
-  {
-    "file": "pdf/invoice-discount.pdf",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/09-line-discount/invoice.pdf",
-    "sha256": "fde2e62f21d6e2e0465610f609adc53760676a896fd1c3a54716d7a0322a650a"
-  },
-  {
-    "file": "png/invoice-discount.png",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/09-line-discount/invoice.png",
-    "sha256": "4e8b8ee274c3fd8f437c47846765c5a19be2e7909b2aab5ac82d49cfa37ed167"
-  },
-  {
-    "file": "../evaluation/dataset/references/invoice-discount.expected.json",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/09-line-discount/expected.json",
-    "sha256": "fa4431254bfac01c39d9aa8678711d447e2dc452dd21581a0ce5ac16788dae73"
-  },
-  {
-    "file": "pdf/invoice-case-pack.pdf",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/12-case-pack/invoice.pdf",
-    "sha256": "8e7cacaca739e7c57683384429fb17584b5f6ccedfd6bb715c6d3b5f17542497"
-  },
-  {
-    "file": "png/invoice-case-pack.png",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/12-case-pack/invoice.png",
-    "sha256": "bdf00c3de08aaf4f1158ec28ef811ce6a4b8eecbb6f0e488141a21bd8cd84cd8"
-  },
-  {
-    "file": "../evaluation/dataset/references/invoice-case-pack.expected.json",
-    "url": "https://raw.githubusercontent.com/SalorWorks/shopify-invoice-test-pack/bb2e531cfa504e6f7200243620121c523f9f7622/fixtures/12-case-pack/expected.json",
-    "sha256": "8a69b160a3257744f0563f98cf996e4f394270510ffb21a3ad2648c3e0203fc6"
+    "file": "pdf/prometni_zakon_izvadak_scan.pdf",
+    "archive_member": "scanned_pdf/prometni_zakon_izvadak_scan.pdf",
+    "archive_sha256": "4f167cc38430eb5bf6d0b50d5e7b1987333afcf6092e3f3dd85741b14d819e68",
+    "sha256": "83f6688f87b029e6da9711b82819e13ceb8402c7a0b97521e6e6ca3407ab788c",
+    "sources": [
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/2011_11_125_2498.html",
+      "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2025_11_136_2018.html",
+      "https://zakoni.lexium.hr/kazneni-zakon",
+      "https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/"
+    ]
   }
 ]

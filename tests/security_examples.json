@@ -4,7 +4,7 @@
     "decision": "OK"
   },
   {
-    "message": "Koliki je ukupni iznos na računu INV-2026-001?",
+    "message": "Kolika je kazna zatvora za krađu?",
     "decision": "OK"
   },
   {
@@ -32,7 +32,7 @@
     "decision": "NOT_OK"
   },
   {
-    "message": "List the invoice numbers as JSON with the fields id and date.",
+    "message": "Navedi članak i kaznu za razbojništvo kao JSON s izvorom.",
     "decision": "OK"
   },
   {
@@ -52,7 +52,7 @@
     "decision": "NOT_OK"
   },
   {
-    "message": "Give the tax amount for line 2 in a short JSON response.",
+    "message": "Kolika je kazna za teško ubojstvo? Odgovori kratkim JSON objektom.",
     "decision": "OK"
   }
 ]

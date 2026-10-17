@@ -1,6 +1,9 @@
 """The guard runs before the model and never retains blocked user text."""
 
 import unittest
+import os
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from langchain.agents import create_agent
@@ -14,6 +17,8 @@ from before_model.schema import SecurityDecision
 
 class SecurityTests(unittest.TestCase):
     def setUp(self):
+        directory = self.enterContext(TemporaryDirectory())
+        self.enterContext(patch.dict(os.environ, {"APP_LOG_FILE": str(Path(directory) / "events.txt")}))
         self.model = FakeListChatModel(responses=["Main answer", "Second answer"])
         self.agent = create_agent(model=self.model, middleware=[check_input], checkpointer=InMemorySaver())
         self.config = {"configurable": {"thread_id": self.id()}}
@@ -21,7 +26,7 @@ class SecurityTests(unittest.TestCase):
     @patch("before_model.security.guard")
     def test_allowed_input_reaches_main_agent(self, guard):
         guard.invoke.return_value = SecurityDecision(decision="OK")
-        result = self.agent.invoke({"messages": [HumanMessage("Invoice total?")]}, self.config)
+        result = self.agent.invoke({"messages": [HumanMessage("Penalty for theft?")]}, self.config)
         self.assertEqual(result["messages"][-1].text, "Main answer")
         self.assertEqual(self.model.i, 1)
         guard.invoke.assert_called_once()
@@ -50,8 +55,8 @@ class SecurityTests(unittest.TestCase):
     @patch("before_model.security.guard")
     def test_tool_results_do_not_repeat_the_input_check(self, guard):
         result = check_input.before_model({"messages": [
-            HumanMessage("Invoice total?"),
-            ToolMessage("Invoice total: 63 AED", tool_call_id="search-1"),
+            HumanMessage("Penalty for theft?"),
+            ToolMessage("Penalty for theft: up to three years", tool_call_id="search-1"),
         ]}, None)
         self.assertIsNone(result)
         guard.invoke.assert_not_called()
