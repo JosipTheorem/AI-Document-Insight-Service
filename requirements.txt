@@ -3,3 +3,6 @@ langchain==1.4.2
 langchain-ollama==1.1.0
 langgraph>=1.2,<2.0
 python-dotenv==1.2.3
+
+# Simple web chat.
+streamlit==1.66.0
