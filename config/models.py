@@ -8,4 +8,4 @@ model_name = "qwen3.5:2b-q4_K_M"
 
 
 def get_model() -> ChatOllama:
-    return ChatOllama(model=model_name)
+    return ChatOllama(model=model_name, temperature=0, reasoning=True, num_ctx=8192)

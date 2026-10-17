@@ -6,8 +6,8 @@ from agent import build_agent
 st.set_page_config(page_title="AI Document Insight", page_icon="💬")
 st.title("Razgovor s agentom")
 
-if "agent" not in st.session_state:
-    st.session_state.agent = build_agent()
+if "document_agent" not in st.session_state:
+    st.session_state.document_agent = build_agent()
     st.session_state.messages = []
 
 for message in st.session_state.messages:
@@ -24,7 +24,7 @@ if prompt and prompt.strip():
     with st.chat_message("assistant"):
         try:
             with st.spinner("Agent razmišlja…"):
-                result = st.session_state.agent.invoke(
+                result = st.session_state.document_agent.invoke(
                     {"messages": [{"role": "user", "content": prompt}]},
                     config={"configurable": {"thread_id": "streamlit-chat"}},
                 )
