@@ -5,7 +5,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from config.models import get_model
 from config.settings import THREAD_CONFIG
-from prompts import load_system_prompt
+from before_model import check_input
+from prompts import load_prompt
 from tools import get_weather, search_documents
 
 
@@ -13,7 +14,8 @@ def build_agent():
     return create_agent(
         model=get_model(),
         tools=[get_weather, search_documents],
-        system_prompt=load_system_prompt(),
+        system_prompt=load_prompt(),
+        middleware=[check_input],
         checkpointer=InMemorySaver(),
     )
 

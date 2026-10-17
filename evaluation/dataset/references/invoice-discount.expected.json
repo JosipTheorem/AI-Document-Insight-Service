@@ -1,0 +1,52 @@
+{
+  "fixtureId": "09-line-discount",
+  "title": "Line-level discount",
+  "tests": "An individual SKU discount with net line totals.",
+  "language": "en",
+  "direction": "ltr",
+  "supplier": {
+    "name": "Fictional Gulf Foods LLC",
+    "legalName": "Fictional Gulf Foods LLC",
+    "address": "Warehouse 12, Al Quoz, Dubai, United Arab Emirates",
+    "taxRegistration": "100123456700003"
+  },
+  "billTo": "Example Grocery Trading LLC, Dubai",
+  "invoiceNumber": "INV-2026-009",
+  "invoiceDate": "2026-08-09",
+  "currency": "AED",
+  "taxLabel": "VAT 5%",
+  "taxRate": 0.05,
+  "subtotal": 132,
+  "discount": 8,
+  "tax": 6.6,
+  "freight": 0,
+  "duty": 0,
+  "total": 138.6,
+  "notes": [
+    "Line 1 carries an AED 8.00 (10%) discount. Subtotal is net of line discounts."
+  ],
+  "lines": [
+    {
+      "description": "Yoghurt 500g",
+      "supplierSku": "SUP-YOG-500",
+      "barcode": "6290000000306",
+      "quantity": 20,
+      "unit": "EA",
+      "unitPrice": 4,
+      "discount": 8,
+      "tax": 0,
+      "lineTotal": 72
+    },
+    {
+      "description": "Labneh 400g",
+      "supplierSku": "SUP-LAB-400",
+      "barcode": "6290000000313",
+      "quantity": 10,
+      "unit": "EA",
+      "unitPrice": 6,
+      "discount": 0,
+      "tax": 0,
+      "lineTotal": 60
+    }
+  ]
+}

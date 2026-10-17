@@ -1,0 +1,39 @@
+{
+  "fixtureId": "01-simple-english",
+  "title": "Simple English invoice",
+  "tests": "Single-page AED table with a clean subtotal, tax and total.",
+  "language": "en",
+  "direction": "ltr",
+  "supplier": {
+    "name": "Fictional Gulf Foods LLC",
+    "legalName": "Fictional Gulf Foods LLC",
+    "address": "Warehouse 12, Al Quoz, Dubai, United Arab Emirates",
+    "taxRegistration": null
+  },
+  "billTo": "Example Grocery Trading LLC, Dubai",
+  "invoiceNumber": "INV-2026-001",
+  "invoiceDate": "2026-08-01",
+  "currency": "AED",
+  "taxLabel": "VAT 5%",
+  "taxRate": 0.05,
+  "subtotal": 60,
+  "discount": 0,
+  "tax": 3,
+  "freight": 0,
+  "duty": 0,
+  "total": 63,
+  "notes": [],
+  "lines": [
+    {
+      "description": "Sparkling Water 330ml",
+      "supplierSku": "SUP-WAT-330",
+      "barcode": "6290000000016",
+      "quantity": 24,
+      "unit": "EA",
+      "unitPrice": 2.5,
+      "discount": 0,
+      "tax": 0,
+      "lineTotal": 60
+    }
+  ]
+}

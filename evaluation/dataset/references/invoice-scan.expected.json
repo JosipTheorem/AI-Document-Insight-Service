@@ -1,0 +1,41 @@
+{
+  "fixtureId": "14-poor-scan",
+  "title": "Poor-quality scan / photo",
+  "tests": "Rotation and uneven contrast as an OCR challenge.",
+  "language": "en",
+  "direction": "ltr",
+  "supplier": {
+    "name": "Fictional Gulf Foods LLC",
+    "legalName": "Fictional Gulf Foods LLC",
+    "address": "Warehouse 12, Al Quoz, Dubai, United Arab Emirates",
+    "taxRegistration": null
+  },
+  "billTo": "Example Grocery Trading LLC, Dubai",
+  "invoiceNumber": "INV-2026-014",
+  "invoiceDate": "2026-08-14",
+  "currency": "AED",
+  "taxLabel": "VAT 5%",
+  "taxRate": 0.05,
+  "subtotal": 60,
+  "discount": 0,
+  "tax": 3,
+  "freight": 0,
+  "duty": 0,
+  "total": 63,
+  "notes": [
+    "PNG is rotated with uneven contrast. PDF embeds the same raster."
+  ],
+  "lines": [
+    {
+      "description": "Sparkling Water 330ml",
+      "supplierSku": "SUP-WAT-330",
+      "barcode": "6290000000016",
+      "quantity": 24,
+      "unit": "EA",
+      "unitPrice": 2.5,
+      "discount": 0,
+      "tax": 0,
+      "lineTotal": 60
+    }
+  ]
+}

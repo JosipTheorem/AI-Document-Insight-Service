@@ -1,0 +1,45 @@
+{
+  "fixtureId": "12-case-pack",
+  "title": "Case-pack invoice",
+  "tests": "5 cases × 12 units = 60 Shopify eaches.",
+  "language": "en",
+  "direction": "ltr",
+  "supplier": {
+    "name": "Fictional Gulf Foods LLC",
+    "legalName": "Fictional Gulf Foods LLC",
+    "address": "Warehouse 12, Al Quoz, Dubai, United Arab Emirates",
+    "taxRegistration": "100123456700003"
+  },
+  "billTo": "Example Grocery Trading LLC, Dubai",
+  "invoiceNumber": "INV-2026-012",
+  "invoiceDate": "2026-08-12",
+  "currency": "AED",
+  "taxLabel": "VAT 5%",
+  "taxRate": 0.05,
+  "subtotal": 144,
+  "discount": 0,
+  "tax": 7.2,
+  "freight": 0,
+  "duty": 0,
+  "total": 151.2,
+  "notes": [
+    "Billed as 5 cases. Each case contains 12 eaches. Shopify receiving quantity is 60 if the store tracks individual cans."
+  ],
+  "lines": [
+    {
+      "description": "Sparkling Water 330ml (12 × 330ml case)",
+      "supplierSku": "SUP-WAT-330-CS",
+      "barcode": "6290000000603",
+      "quantity": 5,
+      "unit": "CS",
+      "unitPrice": 28.8,
+      "discount": 0,
+      "tax": 0,
+      "lineTotal": 144,
+      "pack": {
+        "unitsPerCase": 12,
+        "shopifyQuantity": 60
+      }
+    }
+  ]
+}

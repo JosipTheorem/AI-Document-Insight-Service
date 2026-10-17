@@ -1,0 +1,142 @@
+{
+  "created_at": "2026-10-17T12:52:22.934339+00:00",
+  "agent_model": "qwen3.5:2b-q4_K_M",
+  "judge_model": "qwen3.5:9b-q4_K_M",
+  "embedding_model": "qwen3-embedding:0.6b",
+  "session": "demo",
+  "cases": [
+    {
+      "id": "clean",
+      "question": "What is the total amount including VAT on invoice INV-2026-001?",
+      "queries": [
+        {
+          "query": "invoice INV-2026-001 total amount including VAT"
+        },
+        {
+          "query": "INV-2026-001 total amount including VAT"
+        }
+      ],
+      "passages": [
+        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.",
+        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+      ],
+      "answer": "```json\n{\"invoice_number\": \"INV-2026-001\", \"answer\": \"AED 63.00\", \"source\": \"[invoice-clean.pdf, str. 1]\"}\n```",
+      "error": null,
+      "judge_error": null,
+      "tool_called": true,
+      "exact_gold_hit": true,
+      "strict_json": false,
+      "judge": {
+        "retrieval_ok": true,
+        "format_ok": false,
+        "answer_ok": true,
+        "reason": "The search results contain the correct invoice (INV-2026-001) and the correct total amount (AED 63.00). However, the final_answer is wrapped in markdown code fences (```json ... ```), which violates the format_ok criterion requiring a raw JSON object without extra prose or fences."
+      },
+      "seconds": 11.2
+    },
+    {
+      "id": "multipage",
+      "question": "What is the total amount including VAT on invoice INV-2026-002?",
+      "queries": [
+        {
+          "query": "invoice INV-2026-002 total amount including VAT"
+        }
+      ],
+      "passages": [
+        "[invoice-multipage.pdf, str. 2]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 2 of 2 SKU Description Qty Unit Price Total SUP-MP-13 Ambient Grocery Item 13 2 EA 10.00 20.00 SUP-MP-14 Ambient Grocery Item 14 2 EA 10.00 20.00 SUP-MP-15 Ambient Grocery Item 15 2 EA 10.00 20.00 SUP-MP-16 Ambient Grocery Item 16 2 EA 10.00 20.00 SUP-MP-17 Ambient Grocery Item 17 2 EA 10.00 20.00 SUP-MP-18 Ambient Grocery Item 18 2 EA 10.00 20.00 SUP-MP-19 Ambient Grocery Item 19 2 EA 10.00 20.00 SUP-MP-20 Ambient Grocery Item 20 2 EA 10.00 20.00 Subtotal AED 400.00 VAT 5% AED 20.00 Total AED 420.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-multipage.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 1 of 2 SKU Description Qty Unit Price Total SUP-MP-01 Ambient Grocery Item 01 2 EA 10.00 20.00 SUP-MP-02 Ambient Grocery Item 02 2 EA 10.00 20.00 SUP-MP-03 Ambient Grocery Item 03 2 EA 10.00 20.00 SUP-MP-04 Ambient Grocery Item 04 2 EA 10.00 20.00 SUP-MP-05 Ambient Grocery Item 05 2 EA 10.00 20.00 SUP-MP-06 Ambient Grocery Item 06 2 EA 10.00 20.00 SUP-MP-07 Ambient Grocery Item 07 2 EA 10.00 20.00 SUP-MP-08 Ambient Grocery Item 08 2 EA 10.00 20.00 SUP-MP-09 Ambient Grocery Item 09 2 EA 10.00 20.00 SUP-MP-10 Ambient Grocery Item 10 2 EA 10.00 20.00 SUP-MP-11 Ambient Grocery Item 11 2 EA 10.00 20.00 SUP-MP-12 Ambient Grocery Item 12 2 EA 10.00 20.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+      ],
+      "answer": "```json\n{\"invoice_number\": \"INV-2026-002\", \"answer\": \"AED 420.00\", \"source\": \"[invoice-multipage.pdf, str. 2]\"}\n```",
+      "error": null,
+      "judge_error": null,
+      "tool_called": true,
+      "exact_gold_hit": true,
+      "strict_json": false,
+      "judge": {
+        "retrieval_ok": true,
+        "format_ok": false,
+        "answer_ok": true,
+        "reason": "The retrieval contained the correct evidence (invoice-multipage.pdf page 2) showing the total amount of 420.00 AED for INV-2026-002. The answer is factually correct and cites the right source. However, format_ok is false because the final output includes markdown code fences ('```json' and '```') and extra whitespace/newlines, violating the requirement that the final answer be ONLY a raw JSON object."
+      },
+      "seconds": 5.7
+    },
+    {
+      "id": "discount",
+      "question": "How much is the line-1 discount on invoice INV-2026-009?",
+      "queries": [
+        {
+          "query": "invoice INV-2026-009 line-1 discount"
+        }
+      ],
+      "passages": [
+        "[invoice-discount.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-009 Date: 2026-08-09 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-YOG-500 Yoghurt 500g 20 EA 4.00 72.00 SUP-LAB-400 Labneh 400g 10 EA 6.00 60.00 Subtotal AED 132.00 Discount AED 8.00 VAT 5% AED 6.60 Total AED 138.60 Notes Line 1 carries an AED 8.00 (10%) discount. Subtotal is net of line discounts. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-discount.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-009 Date: 2026-08-09 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-YOG-500 Yoghurt 500g 20 EA 4.00 72.00 SUP-LAB-400 Labneh 400g 10 EA 6.00 60.00 Subtotal AED 132.00 Discount AED 8.00 VAT 5% AED 6.60 Total AED 138.60 Notes Line 1 carries an AED 8.00 (10%) discount. Subtotal is net of line discounts. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-multipage.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-002 Date: 2026-08-02 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Page 1 of 2 SKU Description Qty Unit Price Total SUP-MP-01 Ambient Grocery Item 01 2 EA 10.00 20.00 SUP-MP-02 Ambient Grocery Item 02 2 EA 10.00 20.00 SUP-MP-03 Ambient Grocery Item 03 2 EA 10.00 20.00 SUP-MP-04 Ambient Grocery Item 04 2 EA 10.00 20.00 SUP-MP-05 Ambient Grocery Item 05 2 EA 10.00 20.00 SUP-MP-06 Ambient Grocery Item 06 2 EA 10.00 20.00 SUP-MP-07 Ambient Grocery Item 07 2 EA 10.00 20.00 SUP-MP-08 Ambient Grocery Item 08 2 EA 10.00 20.00 SUP-MP-09 Ambient Grocery Item 09 2 EA 10.00 20.00 SUP-MP-10 Ambient Grocery Item 10 2 EA 10.00 20.00 SUP-MP-11 Ambient Grocery Item 11 2 EA 10.00 20.00 SUP-MP-12 Ambient Grocery Item 12 2 EA 10.00 20.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+      ],
+      "answer": "```json\n{\"invoice_number\": \"INV-2026-009\", \"answer\": \"AED 8.00\", \"source\": \"[invoice-discount.pdf, str. 1]\"}\n```",
+      "error": null,
+      "judge_error": null,
+      "tool_called": true,
+      "exact_gold_hit": true,
+      "strict_json": false,
+      "judge": {
+        "retrieval_ok": true,
+        "format_ok": false,
+        "answer_ok": true,
+        "reason": "The retrieval was successful as the relevant invoice (INV-2026-009) and discount details were found in the tool results. The answer is factually correct (AED 8.00). However, format_ok is false because the final output includes markdown code fences (```json ... ```) and newlines, violating the requirement for a raw JSON object without extra prose or formatting."
+      },
+      "seconds": 3.4
+    },
+    {
+      "id": "case-pack",
+      "question": "How many individual cans are received for invoice INV-2026-012?",
+      "queries": [
+        {
+          "query": "invoice INV-2026-012 individual cans received"
+        }
+      ],
+      "passages": [
+        "[invoice-case-pack.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-012 Date: 2026-08-12 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-WAT-330-CS Sparkling Water 330ml (12 × 330ml case) 5 CS 28.80 144.00 12 eaches / case· Shopify qty 60 Subtotal AED 144.00 VAT 5% AED 7.20 Total AED 151.20 Notes Billed as 5 cases. Each case contains 12 eaches. Shopify receiving quantity is 60 if the store tracks individual cans. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-case-pack.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-012 Date: 2026-08-12 Currency: AED Bill to: Example Grocery Trading LLC, Dubai Tax registration: 100123456700003 SKU Description Qty Unit Price Total SUP-WAT-330-CS Sparkling Water 330ml (12 × 330ml case) 5 CS 28.80 144.00 12 eaches / case · Shopify qty 60 Subtotal AED 144.00 VAT 5% AED 7.20 Total AED 151.20 Notes Billed as 5 cases. Each case contains 12 eaches. Shopify receiving quantity is 60 if the store tracks individu Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+      ],
+      "answer": "```json\n{\"invoice_number\": \"INV-2026-012\", \"answer\": \"60 cans\", \"source\": \"[invoice-case-pack.png, str. 1]\"}\n```",
+      "error": null,
+      "judge_error": null,
+      "tool_called": true,
+      "exact_gold_hit": true,
+      "strict_json": false,
+      "judge": {
+        "retrieval_ok": true,
+        "format_ok": false,
+        "answer_ok": true,
+        "reason": "The retrieval contains sufficient evidence in both the PNG and PDF chunks for invoice INV-2026-012. The answer is factually correct (60 cans), but format_ok is false because the final output includes markdown code fences (```json ... ```) and extra whitespace, violating the requirement for a raw JSON object."
+      },
+      "seconds": 3.1
+    },
+    {
+      "id": "scan",
+      "question": "What is the invoice date of INV-2026-014?",
+      "queries": [
+        {
+          "query": "invoice date of INV-2026-014"
+        },
+        {
+          "query": "INV-2026-014 date"
+        }
+      ],
+      "passages": [
+        "[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.",
+        "[invoice-scan.pdf, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-scan.png, str. 1]\nSYNTHETIC FIXTURE·FICTIONAL SUPPLIER·FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-014 Date: 2026-08-14 Currency: AED Billto: Example Grocery Trading LLC, Dubai SKU SUP-WAT-330 Sparkling Water 330ml Description Qty Unit Price Total 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Notes PNG is rotated with uneven contrast. PDF embeds the same raster. Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice.\n\n[invoice-clean.pdf, str. 1]\nSYNTHETIC FIXTURE · FICTIONAL SUPPLIER · FOR SOFTWARE TESTING Fictional Gulf Foods LLC Warehouse 12, Al Quoz, Dubai, United Arab Emirates TAX INVOICE Invoice: INV-2026-001 Date: 2026-08-01 Currency: AED Bill to: Example Grocery Trading LLC, Dubai SKU Description Qty Unit Price Total SUP-WAT-330 Sparkling Water 330ml 24 EA 2.50 60.00 Subtotal AED 60.00 VAT 5% AED 3.00 Total AED 63.00 Fictional document. Not a real supplier invoice. Not tax, customs or accounting advice."
+      ],
+      "answer": "```json\n{\"invoice_number\": \"INV-2026-014\", \"answer\": \"2026-08-14\", \"source\": \"[invoice-scan.pdf, str. 1]\"}\n```",
+      "error": null,
+      "judge_error": null,
+      "tool_called": true,
+      "exact_gold_hit": true,
+      "strict_json": false,
+      "judge": {
+        "retrieval_ok": true,
+        "format_ok": false,
+        "answer_ok": true,
+        "reason": "The actual tool results contain the correct invoice date (2026-08-14) for INV-2026-014 in multiple sources. However, format_ok is false because the final answer includes markdown code fences (```json ... ```) and newlines, violating the requirement that the output be ONLY a raw JSON object."
+      },
+      "seconds": 4.4
+    }
+  ]
+}
