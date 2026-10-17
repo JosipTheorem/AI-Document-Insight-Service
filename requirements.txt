@@ -6,6 +6,12 @@ python-dotenv==1.2.3
 
 # Simple web chat.
 streamlit==1.66.0
+httpx>=0.28,<1
+
+# HTTP backend and file uploads.
+fastapi>=0.115,<1
+uvicorn>=0.30,<1
+python-multipart>=0.0.20,<1
 
 # Local document ingestion and hybrid retrieval.
 PyMuPDF==1.28.2

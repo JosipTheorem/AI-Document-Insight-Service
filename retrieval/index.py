@@ -191,6 +191,28 @@ class Index:
                      lexical_rank=lexical_ranks.get(i), vector_rank=vector_ranks.get(i),
                      bm25=lexical_scores.get(i), cosine_similarity=cosine[i]) for i in ranked[:top_k]]
 
+    def copy_documents(self, source_session, target_session, content_hashes):
+        """Reuse indexed demo documents in a new scope without another embedding run."""
+        with self.connection() as db:
+            originals = db.execute(
+                "SELECT * FROM documents WHERE session_id=? AND content_hash IN "
+                "(SELECT value FROM json_each(?))",
+                (source_session, json.dumps(content_hashes)),
+            ).fetchall()
+            for doc in originals:
+                if db.execute("SELECT 1 FROM documents WHERE session_id=? AND content_hash=?",
+                              (target_session, doc["content_hash"])).fetchone():
+                    continue
+                new_id = str(uuid4())
+                db.execute("INSERT INTO documents(id,session_id,filename,content_hash,stored_path,pipeline_id) "
+                           "VALUES(?,?,?,?,?,?)", (new_id, target_session, doc["filename"],
+                           doc["content_hash"], doc["stored_path"], doc["pipeline_id"]))
+                db.execute("INSERT INTO pages SELECT ?,page_number,raw_text,clean_text,method,blocks_json,warnings_json "
+                           "FROM pages WHERE document_id=?", (new_id, doc["id"]))
+                db.execute("INSERT INTO chunks(document_id,page_number,ordinal,text,kind,embedding) "
+                           "SELECT ?,page_number,ordinal,text,kind,embedding FROM chunks WHERE document_id=?",
+                           (new_id, doc["id"]))
+
     def documents(self, session_id=DOCUMENT_SESSION):
         with self.connection() as db:
             return [dict(row) for row in db.execute("""SELECT d.id,d.filename,

@@ -1,1 +1,1 @@
-from .tool import search_documents
+from .tool import make_search_documents, search_documents
