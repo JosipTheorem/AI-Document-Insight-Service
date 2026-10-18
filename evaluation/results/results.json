@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-10-18T10:15:05.870742+00:00",
+  "created_at": "2026-10-18T12:03:25.469548+00:00",
   "agent_model": "qwen3.5:2b-q4_K_M",
   "judge_model": "qwen3.5:9b-q4_K_M",
   "embedding_model": "qwen3-embedding:0.6b",
@@ -11,7 +11,7 @@
       "answerable": true,
       "queries": [
         {
-          "query": "krajna kazna zatvora za krađu"
+          "query": "kazna zatvora za krađu"
         }
       ],
       "passages": [
@@ -30,7 +30,7 @@
         "answer_ok": true,
         "reason": "Rezultati pretraživanja sadrže točan članak 228 (1) s kaznom 'do tri godine' za osnovni oblik krađe, što odgovara referenci. Konačni odgovor ispravno citira taj izvor i podatak."
       },
-      "seconds": 4.8
+      "seconds": 50.8
     },
     {
       "id": "legal-05",
@@ -38,11 +38,11 @@
       "answerable": true,
       "queries": [
         {
-          "query": "kazna za teško ubojstvo kazne"
+          "query": "Kazna za teško ubojstvo kazne"
         }
       ],
       "passages": [
-        "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura."
+        "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura."
       ],
       "answer": "{\"answer\": \"Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva\", \"article\": \"111\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
@@ -55,9 +55,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan članak 111. o teškom ubojstvu s odgovarajućom kaznom iz izvora."
+        "reason": "Pretraženi rezultati sadrže članak 111. koji definira kaznu za teško ubojstvo kao najmanje deset godina ili dugotrajni zatvor, što točno odgovara traženom odgovoru i referenci."
       },
-      "seconds": 3.3
+      "seconds": 9.2
     },
     {
       "id": "legal-07",
@@ -71,7 +71,7 @@
       "passages": [
         "[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (2) Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (1) Za osnovni oblik razbojništva propisana je kazna zatvora od jedne do deset godina.\n\n[kazneni_zakon_izvadak.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku."
       ],
-      "answer": "{\"answer\": \"Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\", \"article\": \"230 (2)\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Za osnovni oblik razbojništva propisana je kazna zatvora od jedne do deset godina.\", \"article\": \"230 (1)\", \"source\": \"[kazneni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
@@ -81,10 +81,10 @@
       "abstained": false,
       "judge": {
         "retrieval_ok": true,
-        "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2. koji definira kaznu za razbojništvo uz uporabu oružja kao zatvor od tri do dvanaest godina, što odgovara traženom referentnom odgovoru."
+        "answer_ok": false,
+        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2 koji navodi kaznu od tri do dvanaest godina za razbojništvo uz uporabu oružja. Međutim, konačni odgovor pogrešno citira članak 230 stavak 1 i navedenu kaznu od jedne do deset godina, što se odnosi na osnovni oblik bez kvalifikatora."
       },
-      "seconds": 4.5
+      "seconds": 5.0
     },
     {
       "id": "legal-09",
@@ -92,7 +92,7 @@
       "answerable": true,
       "queries": [
         {
-          "query": "Kazna za prekoračenje brzine u naselju za više od 50 km/h"
+          "query": "kazna za prekoračenje brzine u naselju više od 50 km/h"
         }
       ],
       "passages": [
@@ -109,9 +109,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan izvod članka 53 stavak 3 koji definira kaznu za prekoračenje brzine u naselju za više od 50 km/h. Konačni odgovor ispravno navodi članak, podstavak i novčanu kaznu ili zatvor kako je navedeno u izvodu, uz valjanu referencu na dokument."
+        "reason": "Pretraženi rezultati sadrže točan izvod članka 53 stavak 3 koji definira kaznu za prekoračenje brzine u naselju za više od 50 km/h. Konačni odgovor točno navodi tražene podatke (novčana kazna i zatvor) uz ispravan članak i izvor prisutan u rezultatima pretrage."
       },
-      "seconds": 4.7
+      "seconds": 4.4
     },
     {
       "id": "legal-12",
@@ -119,11 +119,11 @@
       "answerable": true,
       "queries": [
         {
-          "query": "kazna za 0,50 do 1,00 g/kg alkohola kazne za vozače"
+          "query": "kazna za 0,50 do 1,00 g/kg alkohola"
         }
       ],
       "passages": [
-        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
+        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
       ],
       "answer": "{\"answer\": \"Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\", \"article\": \"199 (2)\", \"source\": \"[prometni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
@@ -138,7 +138,7 @@
         "answer_ok": false,
         "reason": "Pretraženi rezultati sadrže točan podatak o kazni (390 do 660 eura) za koncentraciju iznad 0,50 do 1,00 g/kg u članku 199 stavak 6. Međutim, konačni odgovor navodi pogrešan članak ('199 (2)'), koji se odnosi na zabranu vožnje, a ne na visinu kazne. Točan članak iz izvora je '199 (6)'. Stoga je odgovor netočan."
       },
-      "seconds": 5.0
+      "seconds": 4.6
     }
   ]
 }

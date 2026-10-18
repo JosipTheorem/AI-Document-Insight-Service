@@ -17,7 +17,7 @@ from fastapi.testclient import TestClient
 from agent import build_agent
 from api import create_app
 from before_model.security import guard
-from config import PROJECT_ROOT, example_files
+from config import FILES_DIR, PROJECT_ROOT, example_files
 from evaluation.runner import FORMAT_REQUEST, load_dataset, make_judge, new_report, score_case
 from retrieval import Index
 
@@ -35,7 +35,7 @@ def main():
     root = PROJECT_ROOT
     output = root / "evaluation/results"
     output.mkdir(exist_ok=True)
-    os.environ["APP_LOG_FILE"] = str(root / "data/simulation-events.txt")
+    os.environ["APP_LOG_FILE"] = str(output / "simulation-events.txt")
     dataset, manifest = load_dataset(all_cases=True), example_files()
     report, observed, checks = new_report(), {}, []
     report["checks"] = checks
@@ -69,7 +69,7 @@ def main():
                     item_kind = "image" if relative.startswith("png/") else "scan" if relative.endswith("_scan.pdf") else "native"
                     if item_kind != kind:
                         continue
-                    path = root / "files" / relative
+                    path = FILES_DIR / relative
                     response = client.post("/upload", data={"session_id": scope},
                                            files={"file": (path.name, path.read_bytes())})
                     check(f"upload:{path.name}", response.status_code == 200,
@@ -118,7 +118,7 @@ def main():
             check("eleventh_message_blocked", last.status_code == 429 and observed[limited].result is calls_before,
                   status=last.status_code)
 
-            path = root / "files/pdf/kazneni_zakon_izvadak.pdf"
+            path = FILES_DIR / "pdf/kazneni_zakon_izvadak.pdf"
             duplicate = client.post("/upload", data={"session_id": scopes["native"]},
                                     files={"file": (path.name, path.read_bytes())})
             check("duplicate_not_reembedded", duplicate.status_code == 200 and duplicate.json()["status"] == "unchanged")

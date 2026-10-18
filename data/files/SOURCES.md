@@ -2,7 +2,7 @@
 
 Source: the user-provided `Croatian_Legal_Document_QA_Dataset.zip`.
 The archive's original README is preserved verbatim in `ORIGIN.md`; its original
-13 questions and answers are in `../evaluation/dataset/references/questions.json`.
+13 questions and answers are in `../../evaluation/dataset/references/questions.json`.
 `sources.json` records the original archive member, archive SHA-256, file SHA-256
 and source links. File contents were not modified; only folders were renamed.
 
@@ -45,7 +45,7 @@ From the project root, with Ollama and `qwen3-embedding:0.6b` available:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
-$documents = Get-ChildItem files/pdf/*.pdf, files/png/*.png
+$documents = Get-ChildItem data/files/pdf/*.pdf, data/files/png/*.png
 python -m retrieval ingest @($documents.FullName)
 python -m retrieval list
 python agent.py
@@ -54,4 +54,4 @@ python agent.py
 All six formats are deliberately indexed for this demo. Paired files contain
 repeated content, so they are not independent evaluation samples. New web
 sessions receive only manifest-listed public files, reusing their embeddings.
-`data/` holds the generated, Git-ignored index and document snapshots.
+`data/runtime/` holds the generated, Git-ignored index and document snapshots.

@@ -58,6 +58,18 @@ class MonitoringTests(unittest.TestCase):
         self.assertEqual(summary["errors"], 1)
         self.assertNotIn("SECRET_ERROR_DETAILS", self.path.read_text())
 
+    def test_truncated_generations_include_finish_reason_and_empty_text_flag(self):
+        callback = UsageLogger("agent", "local-model")
+        run_id = uuid4()
+        callback.on_chat_model_start({}, [], run_id=run_id)
+        message = AIMessage("", response_metadata={"done_reason": "length"})
+        callback.on_llm_end(LLMResult(generations=[[ChatGeneration(message=message)]]), run_id=run_id)
+        event = json.loads(self.path.read_text())
+        self.assertEqual(event["level"], "WARNING")
+        self.assertEqual(event["finish_reason"], "length")
+        self.assertFalse(event["has_text"])
+        self.assertEqual(event["tool_calls"], 0)
+
     def test_percentiles_error_deduplication_and_completed_call_buckets(self):
         rows = []
         for i, milliseconds in enumerate([1000, 2000, 3000, 4000, 5000]):

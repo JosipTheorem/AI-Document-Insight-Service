@@ -3,7 +3,7 @@
 from ollama import Client
 
 from app_logging import log_event
-from config import EMBEDDING_MODEL, OLLAMA_URL, PROJECT_ROOT, example_files, model_name
+from config import EMBEDDING_MODEL, FILES_DIR, OLLAMA_URL, example_files, model_name
 from retrieval import Index
 
 
@@ -18,7 +18,7 @@ def main():
             log_event("model_download_completed", model=name)  #logging
     index = Index()
     for source in example_files():
-        result = index.ingest(PROJECT_ROOT / "files" / source["file"])
+        result = index.ingest(FILES_DIR / source["file"])
         print(f"{result['filename']}: {result['status']}", flush=True)  #logging
     log_event("demo_ready", document_count=len(index.documents()))  #logging
 

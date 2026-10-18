@@ -157,7 +157,7 @@ class Index:
             db.execute("INSERT OR IGNORE INTO index_meta VALUES(1,?,?)", (self.model_id, vectors.shape[1]))
             db.execute("DELETE FROM documents WHERE id=?", (document_id,))
             db.execute("INSERT INTO documents(id,session_id,filename,content_hash,stored_path,pipeline_id) VALUES(?,?,?,?,?,?)",
-                       (document_id, session_id, path.name, digest, str(snapshot), PIPELINE_ID))
+                       (document_id, session_id, path.name, digest, snapshot.relative_to(self.path.parent).as_posix(), PIPELINE_ID))
             db.executemany("INSERT INTO pages VALUES(?,?,?,?,?,?,?)", [
                 (document_id, p["number"], p["raw"], clean_text("\n\n".join(text for _, text in p["blocks"])),
                  p["method"], json.dumps(p["blocks"], ensure_ascii=False), json.dumps(p["warnings"])) for p in pages])

@@ -11,7 +11,8 @@ __pycache__/
 .streamlit/secrets.toml
 
 # Runtime documents, SQLite index, model files and logs
-/data/
+/data/runtime/
+/evaluation/results/*-events.txt
 /app_logging/logs/
 *.log
 

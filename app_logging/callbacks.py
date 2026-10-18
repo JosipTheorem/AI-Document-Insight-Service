@@ -34,7 +34,10 @@ class UsageLogger(BaseCallbackHandler):
         incoming = usage.get("input_tokens", metadata.get("prompt_eval_count"))
         outgoing = usage.get("output_tokens", metadata.get("eval_count"))
         known = type(incoming) is int and type(outgoing) is int and incoming >= 0 and outgoing >= 0
-        log_event("llm_completed", **call, usage_available=known,  #logging
+        finish_reason = metadata.get("done_reason")
+        log_event("llm_completed", level="WARNING" if finish_reason == "length" else "INFO",  #logging
+                  **call, usage_available=known, finish_reason=finish_reason,
+                  has_text=bool(message.text.strip()), tool_calls=len(message.tool_calls),
                   input_tokens=incoming if known else None, output_tokens=outgoing if known else None,
                   generation_ms=(metadata.get("eval_duration") or 0) / 1_000_000,
                   prompt_ms=(metadata.get("prompt_eval_duration") or 0) / 1_000_000,

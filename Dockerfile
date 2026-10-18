@@ -16,8 +16,8 @@ RUN python -m pip install -r requirements.txt \
     && python -c "from rapidocr import RapidOCR; RapidOCR(params={'Global.log_level': 'warning'})"
 
 RUN useradd --create-home --uid 1000 app \
-    && mkdir -p /app/data /app/app_logging/logs \
-    && chown -R app:app /app/data /app/app_logging/logs
+    && mkdir -p /app/data/runtime /app/app_logging/logs \
+    && chown -R app:app /app/data/runtime /app/app_logging/logs
 
 # Notebook entry point; dependencies are shared with the application.
 FROM base AS evaluation

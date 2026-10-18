@@ -17,7 +17,8 @@ API_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
 
 # SQLite is persistent; Redis is an optional cache (empty URL disables it).
-DATA_DIR = Path(os.getenv("RETRIEVAL_DATA_DIR", PROJECT_ROOT / "data"))
+FILES_DIR = PROJECT_ROOT / "data" / "files"
+DATA_DIR = Path(os.getenv("RETRIEVAL_DATA_DIR", PROJECT_ROOT / "data" / "runtime"))
 DATABASE = DATA_DIR / "index.sqlite3"
 DOCUMENT_SESSION = os.getenv("DOCUMENT_SESSION", "demo")
 REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/0")
@@ -35,11 +36,11 @@ def get_model(purpose="agent"):
     from app_logging.callbacks import UsageLogger
 
     return ChatOllama(model=model_name, base_url=OLLAMA_URL, temperature=0, reasoning=True,
-                      num_ctx=8192, callbacks=[UsageLogger(purpose, model_name)])  #logging
+                      num_ctx=8192, num_predict=2048, callbacks=[UsageLogger(purpose, model_name)])  #logging
 
 
 def example_files():
     """Only these published hashes may be copied into a new conversation."""
-    sources = json.loads((PROJECT_ROOT / "files/sources.json").read_text(encoding="utf-8"))
+    sources = json.loads((FILES_DIR / "sources.json").read_text(encoding="utf-8"))
     return sorted((item for item in sources if item["file"].startswith(("pdf/", "png/"))),
                   key=lambda item: item["file"])

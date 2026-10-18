@@ -1,6 +1,7 @@
 """Local HTTP backend shared by Streamlit and other clients."""
 
 import io
+import json
 import re
 import time
 from contextlib import asynccontextmanager
@@ -13,7 +14,7 @@ from uuid import UUID, uuid4
 
 from fastapi import FastAPI, Form, HTTPException, Request, UploadFile
 import pymupdf
-from langchain_core.messages import ToolMessage
+from langchain_core.messages import ToolMessage, messages_from_dict, messages_to_dict
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
@@ -110,8 +111,13 @@ def create_app(index=None):
     sessions, registry_lock, ingestion_lock = {}, Lock(), Lock()
     with index.connection() as db:
         db.execute("CREATE TABLE IF NOT EXISTS api_sessions (id TEXT PRIMARY KEY)")
-        if "message_count" not in {row["name"] for row in db.execute("PRAGMA table_info(api_sessions)")}:
-            db.execute("ALTER TABLE api_sessions ADD COLUMN message_count INTEGER NOT NULL DEFAULT 0")
+        columns = {row["name"] for row in db.execute("PRAGMA table_info(api_sessions)")}
+        for name, definition in (("message_count", "INTEGER NOT NULL DEFAULT 0"), ("uploaded_file", "TEXT")):
+            if name not in columns:
+                db.execute(f"ALTER TABLE api_sessions ADD COLUMN {name} {definition}")
+        db.execute("""CREATE TABLE IF NOT EXISTS conversation_turns (
+            id INTEGER PRIMARY KEY, session_id TEXT NOT NULL REFERENCES api_sessions(id),
+            question TEXT NOT NULL, answer TEXT NOT NULL, state_json TEXT NOT NULL)""")
 
     @app.middleware("http")
     async def record_request(request: Request, call_next):
@@ -147,12 +153,47 @@ def create_app(index=None):
                 if not db.execute("SELECT 1 FROM api_sessions WHERE id=?", (key,)).fetchone():
                     raise HTTPException(404, "Sesija ne postoji. Započni novi razgovor.")
             if key not in sessions:
-                sessions[key] = Session(build_agent(key, index))
+                agent = build_agent(key, index)
+                with index.connection() as db:
+                    saved = db.execute("SELECT state_json FROM conversation_turns WHERE session_id=? "
+                                       "ORDER BY id DESC LIMIT 1", (key,)).fetchone()
+                if saved:
+                    agent.update_state({"configurable": {"thread_id": key}},
+                                       {"messages": messages_from_dict(json.loads(saved["state_json"]))})
+                sessions[key] = Session(agent)
             return sessions[key]
 
     @app.get("/health")
     def health():
         return {"status": "ok"}
+
+    @app.get("/sessions")
+    def list_sessions():
+        # Local demo: conversations are shared by everyone using this instance.
+        public_hashes = json.dumps([item["sha256"] for item in example_files()])
+        with index.connection() as db:
+            rows = db.execute("""SELECT s.id AS session_id,
+                (SELECT question FROM conversation_turns WHERE session_id=s.id ORDER BY id LIMIT 1) AS title,
+                COALESCE(s.uploaded_file, (SELECT filename FROM documents WHERE session_id=s.id AND content_hash NOT IN
+                    (SELECT value FROM json_each(?)) ORDER BY created_at,id LIMIT 1)) AS uploaded_file
+                FROM api_sessions s ORDER BY
+                (SELECT MAX(id) FROM conversation_turns WHERE session_id=s.id) DESC, s.rowid DESC""",
+                              (public_hashes,)).fetchall()
+        return [{"session_id": row["session_id"],
+                 "title": " ".join(row["title"].split())[:60] if row["title"] else f"Dokument: {row['uploaded_file']}"}
+                for row in rows if row["title"] or row["uploaded_file"]]
+
+    @app.get("/sessions/{session_id}")
+    def conversation(session_id: UUID):
+        get_session(session_id)
+        with index.connection() as db:
+            rows = db.execute("SELECT question, answer FROM conversation_turns WHERE session_id=? ORDER BY id",
+                              (str(session_id),)).fetchall()
+        messages = [message for row in rows for message in (
+            {"role": "user", "content": row["question"]},
+            {"role": "assistant", "content": row["answer"] or "Model tada nije dovršio odgovor. Možeš ponovno poslati pitanje."})]
+        return {"session_id": str(session_id), "messages": messages,
+                "documents": index.documents(str(session_id)), **usage(session_id)}
 
     @app.post("/sessions", status_code=201)
     def new_session(request: SessionRequest):
@@ -191,6 +232,9 @@ def create_app(index=None):
                 path.write_bytes(payload)
                 result = index.ingest(path, session_id=str(session_id))
                 doc = next(d for d in index.documents(str(session_id)) if d["id"] == result["document_id"])
+                with index.connection() as db:
+                    db.execute("UPDATE api_sessions SET uploaded_file=COALESCE(uploaded_file,?) WHERE id=?",
+                               (filename, str(session_id)))
                 log_event("upload_completed", status=result["status"], bytes=len(payload),  #logging
                           pages=doc["pages"], chunks=doc["chunks"], document_id=result["document_id"],
                           duration_ms=round((time.perf_counter() - started) * 1000, 3))
@@ -220,10 +264,15 @@ def create_app(index=None):
                     config={"configurable": {"thread_id": session_id}, "recursion_limit": 20},
                 )
                 answer = result["messages"][-1].text
+                if not answer.strip():
+                    raise RuntimeError("Agent returned an empty answer")
                 evidence = {source for message in result["messages"] if isinstance(message, ToolMessage)
                             and message.name == "search_documents" for source in CITATION.findall(message.text)}
                 sources = [Source(filename=name, page_number=int(page)) for name, page in
                            dict.fromkeys(CITATION.findall(answer)) if (name, page) in evidence]
+                with index.connection() as db:
+                    db.execute("INSERT INTO conversation_turns(session_id, question, answer, state_json) VALUES(?,?,?,?)",
+                               (session_id, request.message, answer, json.dumps(messages_to_dict(result["messages"]))))
                 stats = usage(session_id)
                 log_event("agent_completed", sources=len(sources), **stats)  #logging
                 return AskResponse(session_id=request.session_id, answer=answer, sources=sources, **stats)

@@ -8,7 +8,7 @@ x-app: &app
     REDIS_URL: redis://redis:6379/0
     EMBEDDING_CACHE_TTL: ${EMBEDDING_CACHE_TTL:-604800}
   volumes:
-    - app_logs:/app/app_logging/logs
+    - ./app_logging/logs:/app/app_logging/logs
 
 services:
   redis:
@@ -40,8 +40,8 @@ services:
     <<: *app
     command: ["python", "-m", "deployment.bootstrap"]
     volumes:
-      - document_data:/app/data
-      - app_logs:/app/app_logging/logs
+      - document_data:/app/data/runtime
+      - ./app_logging/logs:/app/app_logging/logs
     depends_on:
       ollama:
         condition: service_healthy
@@ -53,8 +53,8 @@ services:
     ports:
       - "127.0.0.1:${API_PORT:-8000}:8000"
     volumes:
-      - document_data:/app/data
-      - app_logs:/app/app_logging/logs
+      - document_data:/app/data/runtime
+      - ./app_logging/logs:/app/app_logging/logs
     depends_on:
       setup:
         condition: service_completed_successfully
@@ -89,7 +89,7 @@ services:
     ports:
       - "127.0.0.1:${MONITORING_PORT:-8502}:8502"
     volumes:
-      - app_logs:/app/app_logging/logs:ro
+      - ./app_logging/logs:/app/app_logging/logs:ro
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8502/_stcore/health', timeout=3)"]
       interval: 10s
@@ -106,8 +106,9 @@ services:
       target: evaluation
     # The notebook, dataset, judge prompt and saved outputs remain editable locally.
     volumes:
-      - document_data:/app/data
+      - document_data:/app/data/runtime
       - ./evaluation:/app/evaluation
+      - ./app_logging/logs:/app/app_logging/logs
     ports:
       - "127.0.0.1:${JUPYTER_PORT:-8888}:8888"
     depends_on:
@@ -116,5 +117,4 @@ services:
 
 volumes:
   document_data:
-  app_logs:
   ollama_models:

@@ -28,27 +28,45 @@ def api_call(method, route, **kwargs):
         raise RuntimeError("Backend nije dostupan ili je zahtjev istekao. Provjeri je li API pokrenut.") from error
 
 
-if st.sidebar.button("Novi razgovor"):
-    st.session_state.pop("session", None)
-    st.session_state.upload_key = st.session_state.get("upload_key", 0) + 1
-    st.rerun()
-
-if "session" not in st.session_state:
-    try:
+try:
+    conversations = api_call("GET", "/sessions")
+    if "session" not in st.session_state:
+        st.session_state.session = (api_call("GET", f"/sessions/{conversations[0]['session_id']}") if conversations
+                                    else api_call("POST", "/sessions", json={"include_examples": True}))
+    session_id = st.session_state.session["session_id"]
+    st.session_state.session = api_call("GET", f"/sessions/{session_id}")
+    titles = {item["session_id"]: item["title"] for item in conversations}
+    empty = session_id not in titles and st.session_state.session["messages_used"] == 0
+    if st.sidebar.button("Novi razgovor", disabled=empty) and not empty:
         st.session_state.session = api_call("POST", "/sessions", json={"include_examples": True})
-        st.session_state.messages = []
-    except RuntimeError as error:
-        st.error(str(error))
-        if st.button("Pokušaj ponovno"):
-            st.rerun()
-        st.stop()
+        st.session_state.session["messages"] = []
+        session_id = st.session_state.session["session_id"]
+        st.session_state.upload_key = st.session_state.get("upload_key", 0) + 1
+    if session_id not in titles:
+        titles = {session_id: "Novi razgovor", **titles}
+    # Reset the widget when names/order change; a stale option index must not switch chats.
+    choices = list(titles.items())
+    if choices != st.session_state.get("conversation_choices"):
+        st.session_state.conversation_choices = choices
+        st.session_state.conversation_version = st.session_state.get("conversation_version", 0) + 1
+    selected = st.sidebar.selectbox("Razgovori", list(titles), index=list(titles).index(session_id),
+                                    format_func=titles.get, key=f"conversation-{st.session_state.conversation_version}")
+    if selected != session_id:
+        st.session_state.session = api_call("GET", f"/sessions/{selected}")
+        st.session_state.upload_key = st.session_state.get("upload_key", 0) + 1
+    st.sidebar.caption("Razgovori se spremaju lokalno. Vidljivi su svima koji koriste ovu aplikaciju.")
+except RuntimeError as error:
+    st.error(str(error))
+    if st.button("Pokušaj ponovno"):
+        st.rerun()
+    st.stop()
 
 session = st.session_state.session
 session_id = session["session_id"]
 
 
 def refresh_documents():
-    session.update(api_call("GET", "/documents", params={"session_id": session_id}))
+    session.update(api_call("GET", f"/sessions/{session_id}"))
 
 
 with st.sidebar:
@@ -60,13 +78,15 @@ with st.sidebar:
             with st.spinner("Izdvajam tekst i pripremam dokument za razgovor…"):
                 result = api_call("POST", "/upload", data={"session_id": session_id},
                                   files={"file": (uploaded.name, uploaded.getvalue(), uploaded.type)})
-                refresh_documents()
-            st.success("Dokument je već dostupan u razgovoru." if result["status"] == "unchanged"
-                       else "Dokument je spreman. Možeš odmah pitati o njemu.")
-            for warning in result["warnings"]:
-                st.warning(warning)
+            st.session_state.upload_result = result
+            st.rerun()
         except RuntimeError as error:
             st.error(str(error))
+    if result := st.session_state.pop("upload_result", None):
+        st.success("Dokument je već dostupan u razgovoru." if result["status"] == "unchanged"
+                   else "Dokument je spreman. Možeš odmah pitati o njemu.")
+        for warning in result["warnings"]:
+            st.warning(warning)
     st.caption(f"Dokumenata u ovom razgovoru: {len(session['documents'])}")
     st.caption(f"Poruke u sesiji: {session['messages_used']}/{session['message_limit']}")
     if session["documents"]:
@@ -74,7 +94,7 @@ with st.sidebar:
             for document in session["documents"]:
                 st.text(document["filename"])
 
-for message in st.session_state.messages:
+for message in session["messages"]:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
@@ -89,10 +109,7 @@ if prompt and prompt.strip():
     with st.chat_message("assistant"):
         try:
             with st.spinner("Agent razmišlja…"):
-                result = api_call("POST", "/ask", json={"session_id": session_id, "message": prompt})
-            session.update(result)
-            st.session_state.messages.extend([
-                {"role": "user", "content": prompt}, {"role": "assistant", "content": result["answer"]}])
+                api_call("POST", "/ask", json={"session_id": session_id, "message": prompt})
             st.rerun()
         except RuntimeError as error:
             st.error(str(error))

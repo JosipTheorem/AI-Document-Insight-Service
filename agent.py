@@ -9,7 +9,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from config import DOCUMENT_SESSION, MAX_SESSION_MESSAGES, PROJECT_ROOT, SESSION_LIMIT_MESSAGE, get_model
 from before_model import check_input
-from tools import get_weather, make_search_documents
+from tools import make_search_documents
 from tools.search import CITATION
 from app_logging import bind_session, log_context, log_event
 
@@ -47,8 +47,16 @@ def finish_document_reply(request, handler):
             else:
                 properties["sources"] = {"type": "array", "items": {"type": "string", "enum": citations or [""]}}
             schema = {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
-        overrides.update(model=request.model.model_copy(update={"format": schema}), tools=[])
+        overrides.update(model=request.model.model_copy(update={"format": schema, "reasoning": False}), tools=[])
     response = handler(request.override(**overrides))
+    message = response.result[0]
+    if not message.text.strip() and not message.tool_calls:
+        log_event("model_empty_response", level="WARNING", action="retry_without_reasoning",  #logging
+                  finish_reason=message.response_metadata.get("done_reason"))
+        retry_model = overrides.get("model", request.model).model_copy(update={"reasoning": False, "num_predict": 1024})
+        response = handler(request.override(**{**overrides, "model": retry_model}))
+        if not response.result[0].text.strip() and not response.result[0].tool_calls:
+            raise RuntimeError("Model returned an empty response after retry")
     if final_document_reply:
         try:
             message = response.result[0]
@@ -70,7 +78,7 @@ def finish_document_reply(request, handler):
 def build_agent(document_session=DOCUMENT_SESSION, index=None):
     return create_agent(
         model=get_model(),
-        tools=[get_weather, make_search_documents(document_session, index)],
+        tools=[make_search_documents(document_session, index)],
         system_prompt=(PROJECT_ROOT / "prompts/system.txt").read_text(encoding="utf-8").strip(),
         middleware=[check_input, finish_document_reply],
         checkpointer=InMemorySaver(),

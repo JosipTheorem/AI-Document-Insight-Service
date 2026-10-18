@@ -63,7 +63,7 @@ def validate_references(dataset, index):
                 "SELECT 1 FROM chunks c JOIN documents d ON d.id=c.document_id "
                 "WHERE d.session_id=? AND d.filename=? AND c.page_number=? AND c.text=?",
                 (DOCUMENT_SESSION, gold["filename"], gold["page"], gold["text"]),
-            ).fetchone(), f"Missing/stale gold chunk: {case['id']}. Re-ingest files/pdf and files/png."
+            ).fetchone(), f"Missing/stale gold chunk: {case['id']}. Re-ingest data/files/pdf and data/files/png."
 
 
 def new_report():
