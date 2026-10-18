@@ -5,7 +5,7 @@ from pathlib import Path
 from langchain.agents.middleware import before_model
 from langchain_core.messages import AIMessage, RemoveMessage
 
-from config.models import get_model
+from config import get_model
 from app_logging import log_event
 from .schema import SecurityDecision
 

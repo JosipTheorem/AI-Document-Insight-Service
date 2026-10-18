@@ -51,6 +51,16 @@ def render():
     if metrics["missing_usage"]:
         st.warning(f"Za {metrics['missing_usage']} završenih LLM poziva nema token metapodataka. Nisu procijenjeni niti pribrojeni.")
 
+    st.subheader("Redis embedding cache")
+    cache = st.columns(4)
+    hits, misses = metrics["cache_hits"], metrics["cache_misses"]
+    for column, label, value in zip(cache, ["Pogodaka", "Promašaja", "Udio pogodaka", "Grešaka cachea"],
+                                    [hits, misses, f"{hits / (hits + misses):.0%}" if hits + misses else "—", metrics["cache_errors"]]):
+        column.metric(label, value)
+    st.caption("Broje se jedinstveni embedding ulazi po pozivu: upiti i odlomci. "
+               "Pogoci i promašaji uključuju samo uspješne provjere Redisa. "
+               "Ako cache nije dostupan, embedding se računa normalno; ponovni pokušaj je nakon 30 sekundi.")
+
     st.subheader("Tokeni kroz vrijeme")
     minute, second = st.tabs(["Po minuti", "Po sekundi"])
     for container, frequency in ((minute, "min"), (second, "s")):

@@ -6,10 +6,16 @@ from unittest.mock import Mock
 
 from langchain_core.messages import AIMessage
 
-from evaluation.runner import score_case, valid_format
+from evaluation.runner import load_dataset, score_case, valid_format
 
 
 class EvaluationTests(unittest.TestCase):
+    def test_notebook_and_simulations_share_the_same_frozen_references(self):
+        selected, all_cases = load_dataset(), load_dataset(all_cases=True)
+        self.assertEqual(len(selected["cases"]), 5)
+        self.assertEqual(len(all_cases["cases"]), 13)
+        self.assertTrue(all(case in all_cases["cases"] for case in selected["cases"]))
+
     def test_format_requires_raw_json_with_expected_fields_and_a_citation(self):
         answer = json.dumps({"article": "228 (1)", "answer": "Do tri godine.",
                              "source": "[kazneni_zakon_izvadak.pdf, str. 1]"})

@@ -103,10 +103,16 @@ class MonitoringTests(unittest.TestCase):
         log_event("http_request", path="/ask", status_code=200, duration_ms=2000)  #logging
         log_event("llm_completed", model="test", purpose="agent", usage_available=True,  #logging
                   input_tokens=12, output_tokens=4, duration_ms=1000)
+        log_event("embedding_cache", hits=3, misses=1, purpose="query")  #logging
+        log_event("embedding_cache_error", level="WARNING", operation="read", error_type="ConnectionError")  #logging
+        events, _ = read_events(self.path)
+        summary = summarize(events)
+        self.assertEqual((summary["cache_hits"], summary["cache_misses"], summary["cache_errors"]), (3, 1, 1))
         dashboard = Path(__file__).resolve().parents[1] / "monitoring/dashboard.py"
         ui = AppTest.from_file(str(dashboard)).run(timeout=20)
         self.assertFalse(ui.exception)
         self.assertTrue(any(metric.label == "Ulazni tokeni" and metric.value == "12" for metric in ui.metric))
+        self.assertTrue(any(metric.label == "Udio pogodaka" and metric.value == "75%" for metric in ui.metric))
         ui.sidebar.date_input[0].set_value((date(2020, 1, 1), date(2020, 1, 1))).run(timeout=20)
         self.assertFalse(ui.exception)
         self.assertTrue(ui.info)

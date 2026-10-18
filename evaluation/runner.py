@@ -2,20 +2,20 @@
 
 import hashlib
 import json
-import re
 import time
 from datetime import datetime, timezone
 from uuid import uuid4
+from pathlib import Path
 
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_ollama import ChatOllama
 
 from agent import build_agent
-from config.models import model_name
-from config.retrieval import DOCUMENT_SESSION, EMBEDDING_MODEL
+from config import DOCUMENT_SESSION, EMBEDDING_MODEL, OLLAMA_URL, model_name
 from retrieval import Index
-from evaluation.llm_judge import JUDGE_MODEL, JUDGE_SCHEMA, load_prompt
+from evaluation.llm_judge import JUDGE_MODEL, JUDGE_SCHEMA, Verdict, load_prompt
 from app_logging import log_context
+from tools.search import CITATION
 
 FORMAT_REQUEST = (
     '\nOdgovori isključivo jednim JSON objektom s točno tri tekstualna polja: '
@@ -27,6 +27,14 @@ FORMAT_REQUEST = (
 )
 
 
+def load_dataset(all_cases=False):
+    """One frozen dataset; the notebook uses its five selected cases."""
+    dataset = json.loads(Path(__file__).with_name("dataset").joinpath("questions.json").read_text(encoding="utf-8"))
+    if not all_cases:
+        dataset["cases"] = [case for case in dataset["cases"] if case["id"] in dataset["notebook_cases"]]
+    return dataset
+
+
 def valid_format(answer):
     try:
         value = json.loads(answer)
@@ -35,7 +43,7 @@ def valid_format(answer):
             and set(value) == {"article", "answer", "source"}
             and all(isinstance(item, str) for item in value.values())
             and bool(value["answer"].strip())
-            and (bool(re.fullmatch(r"\[[^\]\n]+, str\. [1-9]\d*\]", value["source"]))
+            and (bool(CITATION.fullmatch(value["source"]))
                  or value["article"] == value["source"] == "")
         )
     except (ValueError, TypeError):
@@ -68,7 +76,7 @@ def new_report():
 
 
 def make_judge():
-    return ChatOllama(model=JUDGE_MODEL, temperature=0, reasoning=False,
+    return ChatOllama(model=JUDGE_MODEL, base_url=OLLAMA_URL, temperature=0, reasoning=False,
                      num_ctx=8192, format=JUDGE_SCHEMA)
 
 
@@ -96,13 +104,9 @@ def score_case(case, result, error, judge):
                "actual_tool_results": row["passages"], "final_answer": row["answer"],
                "python_format_ok": row["strict_json"]}
     try:
-        verdict = json.loads(judge.invoke([
+        row["judge"] = Verdict.model_validate_json(judge.invoke([
             ("system", load_prompt()), ("human", json.dumps(payload, ensure_ascii=False))
-        ]).text)
-        assert set(verdict) == set(JUDGE_SCHEMA["required"])
-        assert isinstance(verdict["reason"], str)
-        assert all(type(verdict[key]) is bool for key in ("retrieval_ok", "answer_ok"))
-        row["judge"] = verdict
+        ]).text).model_dump()
     except Exception as judge_error:
         row["judge_error"] = str(judge_error)
         row["judge"] = {"retrieval_ok": False,

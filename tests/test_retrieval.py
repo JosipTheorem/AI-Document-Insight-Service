@@ -11,11 +11,11 @@ import numpy as np
 import pymupdf
 from PIL import Image
 
-from config.retrieval import DOCUMENT_SESSION
+from config import DOCUMENT_SESSION
 from retrieval import Index
 from retrieval.documents import clean_text, column_order, make_chunks, read_page
 from retrieval.index import keywords, rrf
-from tools.search_documents.tool import search_documents
+from tools.search import search_documents
 
 
 def page(text, number=1, kind="text"):
@@ -198,7 +198,7 @@ class IndexTests(unittest.TestCase):
 
 
 class ToolTests(unittest.TestCase):
-    @patch("tools.search_documents.tool._index")
+    @patch("tools.search._index")
     def test_tool_returns_sources_and_uses_the_configured_session(self, get_index):
         get_index().search.return_value = [dict(filename="penalty.pdf", page_number=2, text="Total: 30 EUR", embedding="private")]
         self.assertEqual(search_documents("total"), "[penalty.pdf, str. 2]\nTotal: 30 EUR")

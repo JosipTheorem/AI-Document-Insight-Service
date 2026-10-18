@@ -9,7 +9,7 @@ import numpy as np
 import pymupdf
 from PIL import Image, ImageOps
 
-from config.retrieval import CHUNK_WORDS, OVERLAP_WORDS
+from config import CHUNK_WORDS, OVERLAP_WORDS
 from app_logging import timed
 
 pymupdf.no_recommend_layout()

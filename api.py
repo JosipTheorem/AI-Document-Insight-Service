@@ -1,8 +1,6 @@
 """Local HTTP backend shared by Streamlit and other clients."""
 
 import io
-import json
-import logging
 import re
 import time
 from contextlib import asynccontextmanager
@@ -20,14 +18,12 @@ from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from agent import build_agent
-from config.retrieval import DOCUMENT_SESSION
-from config.settings import MAX_SESSION_MESSAGES, PROJECT_ROOT, SESSION_LIMIT_MESSAGE
+from config import DOCUMENT_SESSION, MAX_SESSION_MESSAGES, SESSION_LIMIT_MESSAGE, example_files
 from retrieval import Index
 from app_logging import bind_session, current_context, log_context, log_event
+from tools.search import CITATION
 
-logger = logging.getLogger(__name__)
 MAX_UPLOAD_BYTES = 30 * 1024 * 1024
-CITATION = re.compile(r"\[([^\]\n]+), str\. ([1-9]\d*)\]")
 
 
 class SessionRequest(BaseModel):
@@ -164,9 +160,7 @@ def create_app(index=None):
         bind_session(session_id)
         # Only the published fixture hashes may be shared with new conversations.
         if request.include_examples:
-            manifest = PROJECT_ROOT / "files" / "sources.json"
-            items = json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else []
-            hashes = [item["sha256"] for item in items if item["file"].startswith(("pdf/", "png/"))]
+            hashes = [item["sha256"] for item in example_files()]
             index.copy_documents(DOCUMENT_SESSION, session_id, hashes)
         with index.connection() as db:
             db.execute("INSERT INTO api_sessions(id) VALUES(?)", (session_id,))
@@ -202,11 +196,9 @@ def create_app(index=None):
                           duration_ms=round((time.perf_counter() - started) * 1000, 3))
                 return {**result, "session_id": session_id, "pages": doc["pages"], "chunks": doc["chunks"]}
         except ValueError as error:
-            logger.warning("Document rejected: %s", error)  #logging
             log_event("upload_rejected", level="WARNING", error_type=type(error).__name__)  #logging
             raise HTTPException(422, "Dokument nije moguće obraditi. Provjeri sadržaj i ograničenja dokumenta.") from error
         except Exception as error:
-            logger.exception("Document ingestion failed")  #logging
             log_event("upload_error", level="ERROR", error_type=type(error).__name__)  #logging
             raise HTTPException(503, "Obrada nije uspjela. Provjeri Ollamu i pokušaj ponovno.") from error
 
@@ -232,12 +224,12 @@ def create_app(index=None):
                             and message.name == "search_documents" for source in CITATION.findall(message.text)}
                 sources = [Source(filename=name, page_number=int(page)) for name, page in
                            dict.fromkeys(CITATION.findall(answer)) if (name, page) in evidence]
-                log_event("agent_completed", sources=len(sources), **usage(session_id))  #logging
-                return AskResponse(session_id=request.session_id, answer=answer, sources=sources, **usage(session_id))
+                stats = usage(session_id)
+                log_event("agent_completed", sources=len(sources), **stats)  #logging
+                return AskResponse(session_id=request.session_id, answer=answer, sources=sources, **stats)
         except HTTPException:
             raise
         except Exception as error:
-            logger.exception("Agent request failed")  #logging
             log_event("agent_error", level="ERROR", error_type=type(error).__name__)  #logging
             raise HTTPException(503, "Odgovor nije uspio. Provjeri Ollamu i pokušaj ponovno.") from error
 

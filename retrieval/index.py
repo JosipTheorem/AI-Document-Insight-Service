@@ -13,11 +13,12 @@ from uuid import uuid4
 import numpy as np
 from ollama import Client
 
-from config.retrieval import (
+from config import (
     BATCH_SIZE, CANDIDATES, DATABASE, DOCUMENT_SESSION, EMBEDDING_MODEL,
     OLLAMA_URL, PIPELINE_ID, RRF_K, RRF_WEIGHTS,
 )
 from retrieval.documents import clean_text, extract, make_chunks
+from retrieval.cache import EmbeddingCache
 from app_logging import timed
 
 SCHEMA = """
@@ -81,6 +82,7 @@ class Index:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self.client = Client(host=OLLAMA_URL, timeout=180)
+        self.cache = EmbeddingCache()
         with self.connection() as db:
             db.executescript(SCHEMA)
 
@@ -106,15 +108,23 @@ class Index:
     def embed(self, texts, query=False):
         if query:
             texts = [f"Instruct: Given a question, retrieve relevant document passages that answer the question\nQuery: {t}" for t in texts]
-        batches = []
-        for start in range(0, len(texts), BATCH_SIZE):
-            batch = texts[start:start + BATCH_SIZE]
+        keys = [self.cache.key(self.model_id, text, query) for text in texts]
+        pending = dict(zip(keys, texts, strict=True))
+        vectors = self.cache.get_many(list(pending))
+        missing = [key for key in pending if key not in vectors]
+        fresh = {}
+        for start in range(0, len(missing), BATCH_SIZE):
+            batch_keys = missing[start:start + BATCH_SIZE]
+            batch = [pending[key] for key in batch_keys]
             response = self.client.embed(model=EMBEDDING_MODEL, input=batch, truncate=False, keep_alive="10m")
-            vectors = normalize(response.embeddings)
-            if len(vectors) != len(batch):
+            computed = normalize(response.embeddings)
+            if len(computed) != len(batch):
                 raise ValueError("Embedding count does not match the input.")
-            batches.append(vectors)
-        return np.vstack(batches)
+            fresh.update(zip(batch_keys, computed, strict=True))
+        vectors.update(fresh)
+        result = normalize([vectors[key] for key in keys])
+        self.cache.put_many(fresh)
+        return result
 
     def ingest(self, path, session_id=DOCUMENT_SESSION, force=False):
         path = Path(path).expanduser().resolve(strict=True)

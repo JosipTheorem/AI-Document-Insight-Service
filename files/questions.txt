@@ -1,0 +1,36 @@
+PITANJA ZA RAZGOVOR S AGENTOM
+
+Ova pitanja odnose se na izvatke Kaznenog zakona i prometnog zakona
+koji su već u projektu. To su testni dokumenti, a ne potpuna provjera
+trenutačno važećih propisa.
+
+U aplikaciji pokreni Novi razgovor s uključenim primjerima dokumenata.
+Kopiraj jedno pitanje u polje za razgovor. Sesija dopušta 10 poruka;
+nakon toga pokreni Novi razgovor.
+
+ZA POČETAK
+Ovih pet pitanja koristimo i u glavnoj evaluaciji.
+
+1. Kolika je kazna zatvora za krađu?
+2. Kolika je kazna za teško ubojstvo?
+3. Kolika je kazna za razbojništvo uz uporabu oružja?
+4. Kolika je kazna za prekoračenje brzine u naselju za više od 50 km/h?
+5. Kolika je kazna za 0,50 do 1,00 g/kg alkohola?
+
+JOŠ PITANJA IZ ISTIH DOKUMENATA
+
+6. Kolika je kazna za krađu male vrijednosti?
+7. Kolika je kazna za krađu velike vrijednosti?
+8. Kolika je kazna za osnovni oblik razbojništva?
+9. Koje je opće ograničenje brzine u naselju?
+10. Smije li mladi vozač voziti s alkoholom u krvi?
+11. Kolika je kazna za vožnju s više od 1,50 g/kg alkohola?
+12. Kolika je kazna zatvora za ubojstvo?
+
+PROVJERA KAD ODGOVORA NEMA U DOKUMENTIMA
+
+13. Koliko godina zatvora predviđa Zakon za hakiranje bankomata?
+
+Za posljednje pitanje agent treba reći da dostavljeni izvadci nemaju
+dovoljno podataka. Za ostala pitanja provjeri navodi li dokument i stranicu
+te razlikuje li osnovni oblik djela od težeg oblika.

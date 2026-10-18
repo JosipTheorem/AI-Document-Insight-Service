@@ -7,12 +7,10 @@ from langchain.agents import create_agent
 from langchain.agents.middleware import wrap_model_call
 from langgraph.checkpoint.memory import InMemorySaver
 
-from config.models import get_model
-from config.settings import MAX_SESSION_MESSAGES, SESSION_LIMIT_MESSAGE, THREAD_CONFIG
-from config.retrieval import DOCUMENT_SESSION
+from config import DOCUMENT_SESSION, MAX_SESSION_MESSAGES, PROJECT_ROOT, SESSION_LIMIT_MESSAGE, get_model
 from before_model import check_input
-from prompts import load_prompt
 from tools import get_weather, make_search_documents
+from tools.search import CITATION
 from app_logging import bind_session, log_context, log_event
 
 
@@ -31,27 +29,24 @@ def finish_document_reply(request, handler):
     json_requested = bool(re.search(r"\bJSON\b", request.messages[start].text, re.I))
     final_document_reply = request.messages[-1].type == "tool" and bool(results)
     if final_document_reply:
-        citations = list(dict.fromkeys(re.findall(r"\[[^\]\n]+, str\. [1-9]\d*\]", "\n".join(m.text for m in results))))
+        passages = "\n\n".join(m.text for m in results)
+        citations = list(dict.fromkeys(match[0] for match in CITATION.finditer(passages)))
         # Use the requested legal QA contract only when those fields were explicitly asked for.
-        fields = ["answer", "article", "source"] if json_requested else ["answer", "sources"]
-        explicit_contract = not json_requested or all(f'"{key}"' in request.messages[start].text for key in fields)
-        schema = {"type": "object", "properties": {key: {"type": "string"} for key in fields},
-                  "required": fields, "additionalProperties": False} if explicit_contract else "json"
-        if explicit_contract:
+        properties = {"answer": {"type": "string"}}
+        schema = "json"
+        if not json_requested or all(f'"{key}"' in request.messages[start].text for key in ("answer", "article", "source")):
             if json_requested:
-                schema["properties"]["source"]["enum"] = ["", *citations]
+                articles = [""]
+                for passage in passages.split("\n\n"):
+                    article = re.search(r"Članak (\d+)\.", passage)
+                    clause = re.search(r"\((\d+)\)", passage)
+                    if article:
+                        articles.append(article[1] + (f" ({clause[1]})" if clause else ""))
+                properties["article"] = {"type": "string", "enum": list(dict.fromkeys(articles))}
+                properties["source"] = {"type": "string", "enum": ["", *citations]}
             else:
-                schema["properties"]["sources"] = {
-                    "type": "array", "items": {"type": "string", "enum": citations or [""]}}
-            if "article" in fields:
-                articles = []
-                for result in results:
-                    for passage in result.text.split("\n\n"):
-                        article = re.search(r"Članak (\d+)\.", passage)
-                        clause = re.search(r"\((\d+)\)", passage)
-                        if article:
-                            articles.append(article[1] + (f" ({clause[1]})" if clause else ""))
-                schema["properties"]["article"]["enum"] = list(dict.fromkeys(["", *articles]))
+                properties["sources"] = {"type": "array", "items": {"type": "string", "enum": citations or [""]}}
+            schema = {"type": "object", "properties": properties, "required": list(properties), "additionalProperties": False}
         overrides.update(model=request.model.model_copy(update={"format": schema}), tools=[])
     response = handler(request.override(**overrides))
     if final_document_reply:
@@ -60,14 +55,12 @@ def finish_document_reply(request, handler):
             value = json.loads(message.text)
             if not value["answer"].strip():
                 value["answer"] = "U vraćenim odlomcima nemam dovoljno podataka za pouzdan odgovor."
-                if "source" in value:
-                    value["source"] = ""
-                if "sources" in value:
-                    value["sources"] = []
-                if "article" in value:
-                    value["article"] = ""
-            text = json.dumps(value, ensure_ascii=False) if json_requested else (
-                value["answer"] + ("\n\n" + " ".join(value["sources"]) if value["sources"] else ""))
+                for key, empty in (("source", ""), ("sources", []), ("article", "")):
+                    if key in value:
+                        value[key] = empty
+            sources = dict.fromkeys(value.get("sources", []))
+            extra = " ".join(source for source in sources if source and source not in value["answer"])
+            text = json.dumps(value, ensure_ascii=False) if json_requested else value["answer"] + ("\n\n" + extra if extra else "")
             response.result[0] = message.model_copy(update={"content": text})
         except (ValueError, KeyError, TypeError):
             pass  # Non-Ollama test models may return ordinary text.
@@ -78,7 +71,7 @@ def build_agent(document_session=DOCUMENT_SESSION, index=None):
     return create_agent(
         model=get_model(),
         tools=[get_weather, make_search_documents(document_session, index)],
-        system_prompt=load_prompt(),
+        system_prompt=(PROJECT_ROOT / "prompts/system.txt").read_text(encoding="utf-8").strip(),
         middleware=[check_input, finish_document_reply],
         checkpointer=InMemorySaver(),
     )
@@ -91,6 +84,7 @@ def main() -> None:
             stream.reconfigure(encoding="utf-8")
 
     agent = build_agent()
+    thread = {"configurable": {"thread_id": "terminal-chat"}}
     messages_used = 0
     print("Agent started. Type 'exit' or 'quit' to leave.")
 
@@ -105,12 +99,12 @@ def main() -> None:
             # Send only the new message; memory keeps earlier turns in this process.
             messages_used += 1
             with log_context("terminal"):
-                bind_session(THREAD_CONFIG["configurable"]["thread_id"])
+                bind_session("terminal-chat")
                 started = time.perf_counter()
                 try:
                     result = agent.invoke(
                         {"messages": [{"role": "user", "content": user_input}]},
-                        config=THREAD_CONFIG,
+                        config=thread,
                     )
                     print(f"Agent: {result['messages'][-1].text}")
                     log_event("terminal_request", status_code=200,  #logging

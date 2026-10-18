@@ -1,0 +1,17 @@
+.git
+.venv
+.env
+.env.*
+!.env.example
+**/__pycache__
+**/*.py[cod]
+**/.ipynb_checkpoints
+.streamlit/secrets.toml
+data
+app_logging/logs
+**/*.log
+Tech Assignment_AI Backend Developer.pdf
+Croatian_Legal_Document_QA_Dataset.zip
+.DS_Store
+Thumbs.db
+Desktop.ini

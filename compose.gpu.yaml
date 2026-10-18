@@ -1,0 +1,4 @@
+# Optional NVIDIA GPU support (Docker Desktop/WSL2 or NVIDIA Container Toolkit).
+services:
+  ollama:
+    gpus: all

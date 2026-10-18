@@ -1,7 +1,10 @@
 from functools import lru_cache
+import re
 
-from config.retrieval import DOCUMENT_SESSION
+from config import DOCUMENT_SESSION
 from retrieval import Index
+
+CITATION = re.compile(r"\[([^\]\n]+), str\. ([1-9]\d*)\]")
 
 
 @lru_cache(maxsize=1)

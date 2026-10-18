@@ -17,8 +17,8 @@ from fastapi.testclient import TestClient
 from agent import build_agent
 from api import create_app
 from before_model.security import guard
-from config.settings import PROJECT_ROOT
-from evaluation.runner import FORMAT_REQUEST, make_judge, new_report, score_case
+from config import PROJECT_ROOT, example_files
+from evaluation.runner import FORMAT_REQUEST, load_dataset, make_judge, new_report, score_case
 from retrieval import Index
 
 
@@ -36,8 +36,7 @@ def main():
     output = root / "evaluation/results"
     output.mkdir(exist_ok=True)
     os.environ["APP_LOG_FILE"] = str(root / "data/simulation-events.txt")
-    dataset = json.loads((root / "evaluation/dataset/all_questions.json").read_text(encoding="utf-8"))
-    manifest = json.loads((root / "files/sources.json").read_text(encoding="utf-8"))
+    dataset, manifest = load_dataset(all_cases=True), example_files()
     report, observed, checks = new_report(), {}, []
     report["checks"] = checks
 
@@ -67,8 +66,6 @@ def main():
                 scope = scopes[kind] = session()
                 for item in manifest:
                     relative = item["file"]
-                    if not relative.startswith(("pdf/", "png/")):
-                        continue
                     item_kind = "image" if relative.startswith("png/") else "scan" if relative.endswith("_scan.pdf") else "native"
                     if item_kind != kind:
                         continue

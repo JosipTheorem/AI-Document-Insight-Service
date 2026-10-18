@@ -5,7 +5,7 @@ import json
 import sys
 from pathlib import Path
 
-from config.retrieval import DATABASE, DOCUMENT_SESSION
+from config import DATABASE, DOCUMENT_SESSION
 from retrieval import Index
 
 
@@ -22,7 +22,6 @@ def main():
     search.add_argument("query")
     search.add_argument("--top-k", type=int, default=5)
     search.add_argument("--document", action="append")
-    search.add_argument("--json", action="store_true", help="Results are always JSON")
     commands.add_parser("list")
     inspect = commands.add_parser("inspect")
     inspect.add_argument("document_id")

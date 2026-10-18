@@ -1,6 +1,7 @@
 """Real HTTP, PDF ingestion, agent graph and SQLite; only model calls are faked."""
 
 import io
+import json
 import os
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -20,8 +21,7 @@ from PIL import Image
 from api import create_app, validate_upload
 from fastapi import HTTPException
 from before_model.schema import SecurityDecision
-from config.retrieval import DOCUMENT_SESSION
-from config.settings import PROJECT_ROOT
+from config import DOCUMENT_SESSION, PROJECT_ROOT
 from retrieval import Index
 
 
@@ -104,8 +104,7 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(duplicate["document_id"], first["document_id"])
         self.index.embed.assert_not_called()
         self.index.embed.side_effect = ConnectionError("Ollama offline")
-        with self.assertLogs("api", level="ERROR"):
-            failed = self.upload(session, pdf_bytes("Different document has a total amount of 60 EUR."))
+        failed = self.upload(session, pdf_bytes("Different document has a total amount of 60 EUR."))
         self.assertEqual(failed.status_code, 503)
         self.assertNotIn(self.temporary.name, failed.text)
         self.assertEqual(len(self.documents(session)), 1)
@@ -145,10 +144,12 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(result.json()["sources"], [])
         self.guard.invoke.return_value = SecurityDecision(decision="OK")
         self.assertEqual(self.ask(session).status_code, 200)
-        with patch.object(SearchModel, "_generate", side_effect=ConnectionError("private backend path")), self.assertLogs("api", level="ERROR"):
+        with patch.object(SearchModel, "_generate", side_effect=ConnectionError("private backend path")):
             result = self.ask(session)
         self.assertEqual(result.status_code, 503)
         self.assertNotIn("private backend path", result.text)
+        events = [json.loads(line) for line in (Path(self.temporary.name) / "events.txt").read_text(encoding="utf-8").splitlines()]
+        self.assertTrue(any(row["event"] == "agent_error" and row["error_type"] == "ConnectionError" for row in events))
 
     def test_only_published_demo_hashes_are_shared_without_reembedding(self):
         self.index.ingest(PROJECT_ROOT / "files/pdf/kazneni_zakon_izvadak.pdf", DOCUMENT_SESSION)
@@ -192,7 +193,7 @@ class ApiTests(unittest.TestCase):
         with patch("httpx.request", side_effect=request) as http:
             ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
             self.assertFalse(ui.exception)
-            first_session = ui.session_state["api_session_id"]
+            first_session = ui.session_state["session"]["session_id"]
             ui.chat_input[0].set_value("What penalty is stated in the document?").run(timeout=20)
             self.assertFalse(ui.exception)
             self.assertEqual(len(ui.chat_message), 2)
@@ -205,7 +206,7 @@ class ApiTests(unittest.TestCase):
             self.assertTrue(any("10 poruka" in info.value for info in ui.info))
             ui.sidebar.button[0].click().run(timeout=20)
             self.assertFalse(ui.exception)
-            self.assertNotEqual(ui.session_state["api_session_id"], first_session)
+            self.assertNotEqual(ui.session_state["session"]["session_id"], first_session)
             self.assertEqual(len(ui.chat_message), 0)
             self.assertFalse(ui.chat_input[0].disabled)
 
@@ -243,7 +244,7 @@ class ApiTests(unittest.TestCase):
         self.guard.invoke.return_value = SecurityDecision(decision="NOT_OK")
         self.assertEqual(self.ask(session).json()["messages_used"], 1)
         self.guard.invoke.return_value = SecurityDecision(decision="OK")
-        with patch.object(SearchModel, "_generate", side_effect=ConnectionError("offline")), self.assertLogs("api", level="ERROR"):
+        with patch.object(SearchModel, "_generate", side_effect=ConnectionError("offline")):
             self.assertEqual(self.ask(session).status_code, 503)
         usage = self.client.get("/documents", params={"session_id": session}).json()
         self.assertEqual(usage["messages_used"], 2)

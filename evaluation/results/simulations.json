@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-10-17T16:37:10.595995+00:00",
+  "created_at": "2026-10-18T10:19:14.436992+00:00",
   "agent_model": "qwen3.5:2b-q4_K_M",
   "judge_model": "qwen3.5:9b-q4_K_M",
   "embedding_model": "qwen3-embedding:0.6b",
@@ -11,7 +11,7 @@
       "answerable": true,
       "queries": [
         {
-          "query": "krajna kazna zatvora za krađu"
+          "query": "kazna zatvora za krađu"
         }
       ],
       "passages": [
@@ -22,17 +22,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
         "reason": "Pretraživanje je uspjelo pronaći relevantan članak 228 (1) u rezultatima alata koji sadrži točnu kaznu od 'do tri godine'. Konačni odgovor ispravno citira taj izvor i daje traženu informaciju."
       },
       "http_status": 200,
-      "agent_seconds": 2.46,
-      "seconds": 5.58,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 2.59,
+      "seconds": 5.1
     },
     {
       "id": "legal-02",
@@ -46,22 +46,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (3) Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (1) Za osnovni oblik krađe propisana je kazna zatvora do tri godine."
       ],
-      "answer": "{\"answer\": \"Članak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku.\", \"article\": \"228 (2)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Za osnovni oblik krađe propisana je kazna zatvora do tri godine.\", \"article\": \"228 (1)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
-        "answer_ok": true,
-        "reason": "Pretraživanje je uspjelo pronaći relevantan članak u skeniranom PDF-u. Odgovor točno navodi članak 228 (2) i kaznu 'do jedne godine' za krađu male vrijednosti, što odgovara referenci."
+        "answer_ok": false,
+        "reason": "Pitanje se odnosi na krađu male vrijednosti, za koju je u referenci naveden članak 228 (2) s kaznom do jedne godine. Iako su rezultati pretrage sadržavali tekst članka 228 (2), konačni odgovor pogrešno je citirao članak 228 (1) koji se odnosi na osnovni oblik krađe, a ne na specifičnu okolnost male vrijednosti. Stoga odgovor nije točan."
       },
       "http_status": 200,
-      "agent_seconds": 6.43,
-      "seconds": 10.19,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.41,
+      "seconds": 6.13
     },
     {
       "id": "legal-03",
@@ -75,22 +75,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (3) Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (1) Za osnovni oblik krađe propisana je kazna zatvora do tri godine.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku."
       ],
-      "answer": "{\"answer\": \"Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina.\", \"article\": \"228 (3)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Za krađu velike vrijednosti propisana je kazna zatvora od šest mjeseci do pet godina.\", \"article\": \"228 (3)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraživanje je uspjelo pronaći relevantan članak (228 stav 3) u rezultatima alata koji sadrže točnu kaznu za krađu velike vrijednosti. Konačni odgovor ispravno navodi članak, kaznu i izvor prisutan u alatima."
+        "reason": "Pretraženi alati su pronašli relevantan tekst u kazneni_zakon_izvadak_scan.pdf koji točno odgovara na pitanje o kazni za krađu velike vrijednosti (članak 228 stavak 3). Konačni odgovor ispravno navodi članak, rang kazne i izvor prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 5.87,
-      "seconds": 9.96,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 7.89,
+      "seconds": 9.94
     },
     {
       "id": "legal-04",
@@ -104,22 +104,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (3) Ako je vrijednost ukradene stvari velika, propisana je kazna zatvora od šest mjeseci do pet godina."
       ],
-      "answer": "{\"answer\": \"Ubojstvo se kazni zatvorenim kaznama najmanje pet godina prema članku 110.\", \"article\": \"110\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\", \"article\": \"110\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan izvor (kazneni_zakon_izvadak_scan.pdf) i članak 110. koji definira ubojstvo s kaznom od najmanje pet godina, što odgovara traženom odgovoru."
+        "reason": "Rezultati pretraživanja sadrže točan članak 110. iz skeniranog PDF-a koji definira kaznu za ubojstvo kao najmanje pet godina zatvora. Konačni odgovor ispravno citira taj članak i navodi pravi izvor iz rezultata pretraživanja."
       },
       "http_status": 200,
-      "agent_seconds": 5.95,
-      "seconds": 9.21,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.33,
+      "seconds": 5.3
     },
     {
       "id": "legal-05",
@@ -133,22 +133,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 111. - Teško ubojstvo (izvadak) Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 110. - Ubojstvo Tko ubije drugoga, kaznit će se kaznom zatvora najmanje pet godina.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura."
       ],
-      "answer": "{\"answer\": \"Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva opisani tim člankom, među ostalim ubojstvo počinjeno na okrutan ili podmukao način.\", \"article\": \"111\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Kaznom zatvora najmanje deset godina ili kaznom dugotrajnog zatvora kažnjavaju se oblici teškog ubojstva\", \"article\": \"111\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi alati su pronašli relevantan članak 111. u skeniranom PDF-u koji točno odgovara na pitanje o kazni za teško ubojstvo. Konačni odgovor ispravno citira tekst iz izvora i navodi točan članak."
+        "reason": "Pretraženi rezultati sadrže članak 111. iz kaznenog zakona koji definira teško ubojstvo i propisuje kaznu od najmanje deset godina ili dugotrajnog zatvora. Konačni odgovor točno navodi tu kaznu, broj članka i izvor prisutan u alatnim rezultatima."
       },
       "http_status": 200,
-      "agent_seconds": 6.23,
-      "seconds": 10.14,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 2.47,
+      "seconds": 10.61
     },
     {
       "id": "legal-06",
@@ -167,17 +167,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Rezultati pretrage sadrže izravni citat članka 230 stavak 1 koji točno odgovara na pitanje o kazni za osnovni oblik razbojništva. Konačni odgovor ispravno navodi članak, podstavak i trajanje kazne uz valjanu referencu na pronađeni dokument."
+        "reason": "Rezultati pretrage sadrže izravno citat članka 230 stavka 1 koji definira kaznu za osnovni oblik razbojništva kao zatvor od jedne do deset godina. Konačni odgovor točno navodi tu kaznu, članak i podatak o izvorniku koji je prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 5.94,
-      "seconds": 7.41,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 2.88,
+      "seconds": 5.03
     },
     {
       "id": "legal-07",
@@ -191,22 +191,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (2) Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 230. - Razbojništvo (izvadak) (1) Za osnovni oblik razbojništva propisana je kazna zatvora od jedne do deset godina.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku."
       ],
-      "answer": "{\"answer\": \"propisana je kazna zatvora od tri do dvanaest godina\", \"article\": \"230 (2)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
+      "answer": "{\"answer\": \"Ako je pribavljena znatna imovinska korist ili je uporabljeno oružje ili opasno oruđe, propisana je kazna zatvora od tri do dvanaest godina.\", \"article\": \"230 (2)\", \"source\": \"[kazneni_zakon_izvadak_scan.pdf, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2 koji definira kaznu za razbojništvo uz uporabu oružja kao zatvor od tri do dvanaest godina. Izvorni odgovor i konačni odgovor se slažu u sadržaju, članku i izvoru."
+        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2 koji definira kaznu za razbojništvo uz uporabu oružja kao zatvor od tri do dvanaest godina. Konačni odgovor ispravno navodi tu kaznu, članak i izvor prisutan u alatima."
       },
       "http_status": 200,
-      "agent_seconds": 2.54,
-      "seconds": 3.95,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.75,
+      "seconds": 5.74
     },
     {
       "id": "legal-08",
@@ -225,17 +225,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže izvadak članka 53 stavka (1) koji točno odgovara pitanju o općem ograničenju brzine u naselju. Konačni odgovar je ispravan i navodi točnu brzinu, članak te izvor prisutan u alatnim rezultatima."
+        "reason": "Pretraženi alati su pronašli relevantne izvadke (uključujući PNG slika) koji sadrže točan članak 53 stavak 1. Konačni odgovar točno navodi ograničenje od 50 km/h, citira ispravan članak i naveden je izvor prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 2.36,
-      "seconds": 3.78,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 2.96,
+      "seconds": 5.14
     },
     {
       "id": "legal-09",
@@ -254,17 +254,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi alati su pronašli relevantne izvadke (slika i PDF) koji sadrže točan članak 53 stavak 3. Odgovor točno navodi kaznu od 1.320 do 2.650 eura ili zatvor do 60 dana za prekoračenje više od 50 km/h, što se usklađuje s referentnim podacima."
+        "reason": "Rezultati pretrage sadrže točan izvadak članka 53 stavka (3) koji definira kaznu za prekoračenje brzine u naselju za više od 50 km/h. Konačni odgovar točno navodi tražene podatke (novčana kazna i zatvor), ispravan članak i izvor prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 2.43,
-      "seconds": 4.06,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.34,
+      "seconds": 5.28
     },
     {
       "id": "legal-10",
@@ -283,17 +283,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi alati sadrže izravnu potvrdu u članku 199 (1) da za mlade vozače vrijedi zabrana vožnje uz bilo kakav alkohol. Konačni odgovor točno citira taj članak i navodi relevantni izvorni dokument koji je pronađen."
+        "reason": "Pretraženi alati sadrže izravnu potvrdu u članku 199 (1) da za mlade vozače vrijedi zabrana vožnje uz bilo kakav alkohol. Konačni odgovor točno citira taj članak i navodi relevantni izvorni dokument prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 2.19,
-      "seconds": 3.56,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.04,
+      "seconds": 4.81
     },
     {
       "id": "legal-11",
@@ -312,17 +312,17 @@
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Rezultati pretrage sadrže točan izvadak članka 199 stavak 8. koji definira kaznu za koncentraciju iznad 1,50 g/kg. Konačni odgovor točno navodi tražene podatke (novčana kazna i zatvor) uz ispravan članak i izvor prisutan u rezultatima pretrage."
+        "reason": "Alati su uspješno pronašli relevantni odlomak iz izvora koji sadrži točnu kaznu za koncentraciju alkohola iznad 1,50 g/kg (Članak 199 stavak 8). Konačni odgovor točno citira tu informaciju i navodi ispravan članak i izvor prisutan u rezultatima pretrage."
       },
       "http_status": 200,
-      "agent_seconds": 2.35,
-      "seconds": 3.86,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.05,
+      "seconds": 5.13
     },
     {
       "id": "legal-12",
@@ -334,24 +334,24 @@
         }
       ],
       "passages": [
-        "[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
+        "[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
       ],
       "answer": "{\"answer\": \"Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\", \"article\": \"199 (6)\", \"source\": \"[prometni_zakon_izvadak_stranica_1.png, str. 1]\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": false,
+      "gold_text_hit": true,
       "strict_json": true,
+      "abstained": false,
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi alati sadrže sliku stranice 1 koja izričito navodi članak 199 stavak 6 s točnom kaznom od 390 do 660 eura za koncentraciju između 0,50 i 1,00 g/kg. Konačni odgovor točno citira taj podatak iz izvora."
+        "reason": "Pretraženi alati sadrže izravne dokaze (PDF i PNG) koji potvrđuju članak 199 stavak 6. s točnom kaznom od 390 do 660 eura za navedenu koncentraciju alkohola, što odgovara referenci."
       },
       "http_status": 200,
-      "agent_seconds": 3.54,
-      "seconds": 5.05,
-      "gold_text_hit": true,
-      "abstained": false
+      "agent_seconds": 3.01,
+      "seconds": 4.8
     },
     {
       "id": "legal-13",
@@ -365,22 +365,22 @@
       "passages": [
         "[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (2) Ako je vrijednost ukradene stvari mala, propisana je kazna zatvora do jedne godine, uz uvjete navedene u članku.\n\n[kazneni_zakon_izvadak_scan.pdf, str. 1]\nČlanak 228. - Krađa (izvadak) (1) Za osnovni oblik krađe propisana je kazna zatvora do tri godine.\n\n[prometni_zakon_izvadak_scan.pdf, str. 1]\nIzvori i važna napomena Tekst Zakona (Centar za vozila Hrvatske): https://cvh.hr/gradani/propisi-i-upute/zakoni/zakon-o-sigurnosti-prometa-na-cestama/ Pomoćni službeni vodičMUP-a: https://mup.gov.hr/promet-281589/281589 Ovo je pojednostavljen testni izvadak, ne cjeloviti službeni tekst. Pravni status i stvarne kazne mogu ovisiti o okolnostima i izmjenama propisa. TESTNI IZVADAK - nije službena objava cjelovitog zakona 1"
       ],
-      "answer": "{\"answer\": \"U vraćenim odlomcima nemam dovoljno podataka za pouzdan odgovor.\", \"article\": \"\", \"source\": \"\"}",
+      "answer": "{\"answer\": \"U dostavljenim izvadcima nije naveden odgovor na to pitanje.\", \"article\": \"\", \"source\": \"\"}",
       "error": null,
       "judge_error": null,
       "tool_called": true,
       "exact_gold_hit": null,
+      "gold_text_hit": null,
       "strict_json": true,
+      "abstained": true,
       "judge": {
         "retrieval_ok": false,
-        "answer_ok": false,
-        "reason": "Pretraženi rezultati sadrže samo članak o krađi (228.) i prometni zakon. Nema nikakvih podataka o hakiranju bankomata niti odgovarajućih kaznenih odredbi u izvrsenim odlomcima, pa je nemoguće potvrditi traženu činjenicu."
+        "answer_ok": true,
+        "reason": "Pretraženi rezultati sadrže samo članak o krađi (228.) i prometni zakon. Članka o hakiranju bankomata u pretraženim izvancima nema, pa je odgovor točan jer navodi da informacija nije dostupna."
       },
       "http_status": 200,
-      "agent_seconds": 4.33,
-      "seconds": 5.72,
-      "gold_text_hit": null,
-      "abstained": true
+      "agent_seconds": 2.95,
+      "seconds": 4.62
     }
   ],
   "checks": [
@@ -389,9 +389,9 @@
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "e78dd770-dfda-48bf-a498-47e642580fcc",
+        "session_id": "4f566590-5f0c-42a6-845f-bd7b03f10b2e",
         "status": "indexed",
-        "document_id": "bde46be7-e145-4947-831d-b0d298fb490d",
+        "document_id": "8c8aa4b3-37bb-42ca-8e11-e2f38a1a9e5b",
         "filename": "kazneni_zakon_izvadak.pdf",
         "pages": 1,
         "chunks": 10,
@@ -409,9 +409,9 @@
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "e78dd770-dfda-48bf-a498-47e642580fcc",
+        "session_id": "4f566590-5f0c-42a6-845f-bd7b03f10b2e",
         "status": "indexed",
-        "document_id": "32714e5e-47fe-43cd-a738-25a74ceefb3a",
+        "document_id": "0e3b4775-7ee4-4e6c-bd51-ce582be2339a",
         "filename": "prometni_zakon_izvadak.pdf",
         "pages": 1,
         "chunks": 11,
@@ -434,17 +434,16 @@
           "page_number": 1
         }
       ],
-      "seconds": 1.6,
-      "transport": "live HTTP"
+      "seconds": 3.2
     },
     {
       "name": "upload:kazneni_zakon_izvadak_stranica_1.png",
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "6a9d9edf-e4d7-47ac-b0dc-245ad185a6bb",
+        "session_id": "24e12641-0439-43c8-898c-3838b6df65e7",
         "status": "indexed",
-        "document_id": "a8bd2cb5-42a5-4ea1-a0a5-4c5ad556ae59",
+        "document_id": "20da68e6-4939-4b81-8b22-b991998c6420",
         "filename": "kazneni_zakon_izvadak_stranica_1.png",
         "pages": 1,
         "chunks": 10,
@@ -462,9 +461,9 @@
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "6a9d9edf-e4d7-47ac-b0dc-245ad185a6bb",
+        "session_id": "24e12641-0439-43c8-898c-3838b6df65e7",
         "status": "indexed",
-        "document_id": "080f679c-b515-41e6-bfee-3f2a3c2c920b",
+        "document_id": "270b45b3-22ae-41df-9c0d-50afe3b0f717",
         "filename": "prometni_zakon_izvadak_stranica_1.png",
         "pages": 1,
         "chunks": 11,
@@ -487,17 +486,16 @@
           "page_number": 1
         }
       ],
-      "seconds": 1.8,
-      "transport": "live HTTP"
+      "seconds": 2.34
     },
     {
       "name": "upload:kazneni_zakon_izvadak_scan.pdf",
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "92998d30-1f7a-4818-aefc-4e02c33928cb",
+        "session_id": "17a963c7-2723-4b1e-88d8-41acf11da2ca",
         "status": "indexed",
-        "document_id": "c12048fc-6e37-455f-9ff3-51a6ae909445",
+        "document_id": "c581bf2b-23dd-4884-b748-27d9352e1231",
         "filename": "kazneni_zakon_izvadak_scan.pdf",
         "pages": 1,
         "chunks": 10,
@@ -515,9 +513,9 @@
       "passed": true,
       "status": 200,
       "response": {
-        "session_id": "92998d30-1f7a-4818-aefc-4e02c33928cb",
+        "session_id": "17a963c7-2723-4b1e-88d8-41acf11da2ca",
         "status": "indexed",
-        "document_id": "706cff24-0008-4cdf-a31d-afdc5c3ce621",
+        "document_id": "1bbab091-eee5-44af-b73f-f7c9f762cf98",
         "filename": "prometni_zakon_izvadak_scan.pdf",
         "pages": 1,
         "chunks": 11,
@@ -540,13 +538,12 @@
           "page_number": 1
         }
       ],
-      "seconds": 1.66,
-      "transport": "live HTTP"
+      "seconds": 2.39
     },
     {
       "name": "empty_session_has_no_sources",
       "passed": true,
-      "answer": "Prema zakonu o kaznenim djelima, osnovna kazna za krađu je zatvor od 1 do 3 godine."
+      "answer": ""
     },
     {
       "name": "eleventh_message_blocked",
@@ -565,6 +562,5 @@
       "name": "empty_session_stays_empty",
       "passed": true
     }
-  ],
-  "natural_chat_rechecked_at": "2026-10-17T16:43:47.258487+00:00"
+  ]
 }

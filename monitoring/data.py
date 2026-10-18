@@ -6,7 +6,7 @@ import pandas as pd
 
 COLUMNS = ["timestamp", "event_id", "event", "level", "request_id", "run_id", "interface",
            "path", "status_code", "duration_ms", "input_tokens", "output_tokens",
-           "usage_available", "generation_ms", "purpose", "model"]
+           "usage_available", "generation_ms", "purpose", "model", "hits", "misses"]
 
 
 def read_events(path):
@@ -29,7 +29,7 @@ def read_events(path):
     skipped += int(frame["timestamp"].isna().sum())
     frame = frame.dropna(subset=["timestamp"])
     frame["timestamp"] = frame["timestamp"].dt.tz_convert("Europe/Zagreb")
-    for column in ("status_code", "duration_ms", "input_tokens", "output_tokens", "generation_ms"):
+    for column in ("status_code", "duration_ms", "input_tokens", "output_tokens", "generation_ms", "hits", "misses"):
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
     return frame.sort_values("timestamp"), skipped
 
@@ -47,6 +47,7 @@ def summarize(events):
     measured = calls[calls["usage_available"] == True]
     failures = events[events["level"] == "ERROR"]
     error_ids = failures["request_id"].fillna(failures["run_id"]).fillna(failures["event_id"])
+    cache = events[events["event"] == "embedding_cache"]
     return {
         "requests": len(http), "answers": len(latency),
         "median": latency.median(), "p95": latency.quantile(.95), "p99": latency.quantile(.99),
@@ -56,6 +57,8 @@ def summarize(events):
         "rejected": int(http["status_code"].between(400, 499).sum()),
         "blocked": int((events["event"] == "security_blocked").sum()),
         "missing_usage": int(len(calls) - len(measured)),
+        "cache_hits": int(cache["hits"].sum()), "cache_misses": int(cache["misses"].sum()),
+        "cache_errors": int((events["event"] == "embedding_cache_error").sum()),
     }
 
 
