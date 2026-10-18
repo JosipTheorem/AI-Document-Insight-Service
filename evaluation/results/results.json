@@ -1,5 +1,5 @@
 {
-  "created_at": "2026-10-18T12:03:25.469548+00:00",
+  "created_at": "2026-10-18T13:26:08.230905+00:00",
   "agent_model": "qwen3.5:2b-q4_K_M",
   "judge_model": "qwen3.5:9b-q4_K_M",
   "embedding_model": "qwen3-embedding:0.6b",
@@ -30,7 +30,7 @@
         "answer_ok": true,
         "reason": "Rezultati pretraživanja sadrže točan članak 228 (1) s kaznom 'do tri godine' za osnovni oblik krađe, što odgovara referenci. Konačni odgovor ispravno citira taj izvor i podatak."
       },
-      "seconds": 50.8
+      "seconds": 3.5
     },
     {
       "id": "legal-05",
@@ -55,9 +55,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže članak 111. koji definira kaznu za teško ubojstvo kao najmanje deset godina ili dugotrajni zatvor, što točno odgovara traženom odgovoru i referenci."
+        "reason": "Pretraženi rezultati sadrže izravni citat članka 111. koji definira kaznu za teško ubojstvo kao najmanje deset godina ili dugotrajni zatvor, što točno odgovara traženom referentnom odgovoru."
       },
-      "seconds": 9.2
+      "seconds": 3.2
     },
     {
       "id": "legal-07",
@@ -82,9 +82,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": false,
-        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2 koji navodi kaznu od tri do dvanaest godina za razbojništvo uz uporabu oružja. Međutim, konačni odgovor pogrešno citira članak 230 stavak 1 i navedenu kaznu od jedne do deset godina, što se odnosi na osnovni oblik bez kvalifikatora."
+        "reason": "Pretraženi rezultati sadrže točan članak 230 stavak 2 koji navodi kaznu od tri do dvanaest godina za razbojništvo uz uporabu oružja. Međutim, konačni odgovor pogrešno citira članak 230 stavak 1 i navedenu kaznu od jedne do deset godina, što se odnosi na osnovni oblik bez uporabe oružja."
       },
-      "seconds": 5.0
+      "seconds": 3.7
     },
     {
       "id": "legal-09",
@@ -109,9 +109,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": true,
-        "reason": "Pretraženi rezultati sadrže točan izvod članka 53 stavak 3 koji definira kaznu za prekoračenje brzine u naselju za više od 50 km/h. Konačni odgovor točno navodi tražene podatke (novčana kazna i zatvor) uz ispravan članak i izvor prisutan u rezultatima pretrage."
+        "reason": "Pretraženi rezultati sadrže točan članak 53 stavak (3) koji definira kaznu za prekoračenje brzine iznad 50 km/h u naselju. Konačni odgovor točno navodi tražene podatke (novčana kazna i zatvor), citira ispravan članak i podaci su potkrijepljeni izvornim dokumentom."
       },
-      "seconds": 4.4
+      "seconds": 3.8
     },
     {
       "id": "legal-12",
@@ -123,7 +123,7 @@
         }
       ],
       "passages": [
-        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak_stranica_1.png, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
+        "[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (6) Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (7) Za koncentraciju iznad 1,00 do 1,50 g/kg propisana je novčana kazna od 660 do 1.990 eura.\n\n[prometni_zakon_izvadak.pdf, str. 1]\nČlanak 199. - Alkohol i vožnja (izvadak) (2) Za većinu vozača kategorije B u neprofesionalnoj vožnji zabranjena je vožnja uz koncentraciju alkohola veću od 0,50 g/kg."
       ],
       "answer": "{\"answer\": \"Za koncentraciju iznad 0,50 do 1,00 g/kg propisana je novčana kazna od 390 do 660 eura.\", \"article\": \"199 (2)\", \"source\": \"[prometni_zakon_izvadak.pdf, str. 1]\"}",
       "error": null,
@@ -136,9 +136,9 @@
       "judge": {
         "retrieval_ok": true,
         "answer_ok": false,
-        "reason": "Pretraženi rezultati sadrže točan podatak o kazni (390 do 660 eura) za koncentraciju iznad 0,50 do 1,00 g/kg u članku 199 stavak 6. Međutim, konačni odgovor navodi pogrešan članak ('199 (2)'), koji se odnosi na zabranu vožnje, a ne na visinu kazne. Točan članak iz izvora je '199 (6)'. Stoga je odgovor netočan."
+        "reason": "Pretraženi rezultati sadrže točan podatak o kazni (390 do 660 eura) za koncentraciju iznad 0,50 do 1,00 g/kg u članku 199 stavak 6. Međutim, konačni odgovor navodi pogrešan članak ('199 (2)'), koji se odnosi na zabranu vožnje, a ne na visinu kazne. Točan članak iz izvora je '199 (6)'. Stoga odgovor nije točan."
       },
-      "seconds": 4.6
+      "seconds": 4.2
     }
   ]
 }

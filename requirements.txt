@@ -16,6 +16,7 @@ python-multipart==0.0.32
 
 # Local document ingestion and hybrid retrieval.
 PyMuPDF==1.28.2
+pymupdf4llm==1.28.2
 Pillow==12.3.0
 rapidocr==3.10.0
 onnxruntime==1.31.0

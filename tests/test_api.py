@@ -177,6 +177,60 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(len(ui.chat_message), 6)
             self.assertEqual(len(self.client.get(f"/sessions/{second}").json()["messages"]), 2)
 
+    def test_streamlit_recovers_missing_sessions_but_keeps_session_on_server_errors(self):
+        import httpx
+        from streamlit.testing.v1 import AppTest
+
+        saved = self.session()
+        self.ask(saved, "Saved conversation")
+        unavailable = False
+
+        def request(method, url, **kwargs):
+            if unavailable and method == "GET" and "/sessions/" in url:
+                return httpx.Response(503, json={"detail": "Temporarily unavailable"},
+                                      request=httpx.Request(method, url))
+            kwargs.pop("timeout", None)
+            response = self.client.request(method, url, **kwargs)
+            return httpx.Response(response.status_code, content=response.content, headers=response.headers,
+                                  request=httpx.Request(method, url))
+
+        with patch("httpx.request", side_effect=request):
+            ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
+            self.assertEqual(ui.session_state["session"]["session_id"], saved)
+            unavailable = True
+            ui.run(timeout=20)
+            self.assertTrue(ui.error)
+            self.assertEqual(ui.session_state["session"]["session_id"], saved)
+            unavailable = False
+            ui.button[0].click().run(timeout=20)
+            self.assertFalse(ui.error)
+            self.assertEqual(ui.session_state["session"]["session_id"], saved)
+
+            ui.sidebar.button[0].click().run(timeout=20)
+            missing = ui.session_state["session"]["session_id"]
+            with self.index.connection() as db:
+                db.execute("DELETE FROM api_sessions WHERE id=?", (missing,))
+            ui.run(timeout=20)
+            self.assertFalse(ui.exception)
+            self.assertFalse(ui.error)
+            self.assertEqual(ui.session_state["session"]["session_id"], saved)
+            self.assertEqual(len(ui.chat_message), 2)
+            self.assertFalse(ui.chat_input[0].disabled)
+
+            with self.index.connection() as db:
+                db.execute("DELETE FROM conversation_turns WHERE session_id=?", (saved,))
+                db.execute("DELETE FROM api_sessions WHERE id=?", (saved,))
+            ui.run(timeout=20)
+            fresh = ui.session_state["session"]["session_id"]
+            self.assertNotIn(fresh, (saved, missing))
+            self.assertFalse(ui.exception)
+            self.assertFalse(ui.error)
+            self.assertEqual(len(ui.chat_message), 0)
+            self.assertFalse(ui.chat_input[0].disabled)
+            ui.chat_input[0].set_value("Hello after recovery").run(timeout=20)
+            self.assertEqual(len(ui.chat_message), 2)
+            self.assertEqual(ui.session_state["session"]["messages_used"], 1)
+
     def test_upload_is_immediately_searchable_and_sessions_are_isolated(self):
         alice, bob = self.session(), self.session()
         first = pdf_bytes("PRIVATE_ALICE legal penalty is 123456 EUR.")

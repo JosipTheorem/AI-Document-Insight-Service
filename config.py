@@ -26,7 +26,7 @@ EMBEDDING_CACHE_TTL = int(os.getenv("EMBEDDING_CACHE_TTL", str(7 * 24 * 60 * 60)
 CHUNK_WORDS, OVERLAP_WORDS = 220, 35
 BATCH_SIZE, CANDIDATES, RRF_K = 8, 30, 60
 RRF_WEIGHTS = (1, 2)  # BM25, vector: semantic matching handles Croatian inflections.
-PIPELINE_ID = f"simple-v2-articles:{CHUNK_WORDS}:{OVERLAP_WORDS}"
+PIPELINE_ID = f"pymupdf4llm-1.28.2-articles:{CHUNK_WORDS}:{OVERLAP_WORDS}"
 MAX_SESSION_MESSAGES = 10
 SESSION_LIMIT_MESSAGE = "Iskoristio si svih 10 poruka u ovoj sesiji. Pokreni novi razgovor za nastavak."
 

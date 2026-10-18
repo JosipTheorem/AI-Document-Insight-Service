@@ -18,6 +18,12 @@ def api_call(method, route, **kwargs):
     except httpx.HTTPStatusError as error:
         log_event("ui_http_error", level="WARNING", interface="streamlit", path=route,  #logging
                   status_code=error.response.status_code, request_id=error.response.headers.get("X-Request-ID"))
+        if error.response.status_code == 404 and method == "GET" and route.startswith("/sessions/"):
+            # The backend/database may have changed; reload a valid conversation.
+            st.session_state.pop("session", None)
+            st.session_state.pop("upload_result", None)
+            st.session_state.upload_key = st.session_state.get("upload_key", 0) + 1
+            st.rerun()
         try:
             detail = error.response.json().get("detail")
         except ValueError:

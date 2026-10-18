@@ -9,13 +9,14 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pymupdf
-from PIL import Image
+from PIL import Image, ImageDraw
+from langchain_core.utils.function_calling import convert_to_openai_tool
 
 from config import DOCUMENT_SESSION
 from retrieval import Index
-from retrieval.documents import clean_text, column_order, make_chunks, read_page
+from retrieval.documents import clean_text, extract, make_chunks, read_page
 from retrieval.index import keywords, rrf
-from tools.search import search_documents
+from tools.search import make_search_documents
 
 
 def page(text, number=1, kind="text"):
@@ -48,13 +49,31 @@ class ProcessingTests(unittest.TestCase):
         self.assertIn("Speed", chunks[0]["text"])
         self.assertNotIn("Alcohol", chunks[0]["text"])
 
+    def test_multi_page_pdf_keeps_text_and_page_attribution(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            path = Path(temporary) / "two-pages.pdf"
+            with pymupdf.open() as document:
+                for marker in ("FIRST_PAGE", "SECOND_PAGE"):
+                    document.new_page().insert_text((50, 70), marker + " contains a separate paragraph for this document.")
+                document.save(path)
+            with patch.dict(os.environ, {"APP_LOG_FILE": str(Path(temporary) / "events.txt")}):
+                pages = extract(path)
+        self.assertEqual([p["number"] for p in pages], [1, 2])
+        self.assertIn("FIRST_PAGE", pages[0]["raw"])
+        self.assertNotIn("SECOND_PAGE", pages[0]["raw"])
+        self.assertIn("SECOND_PAGE", pages[1]["raw"])
+
     def test_columns_are_not_interleaved(self):
-        blocks = [(pymupdf.Rect(box), ("text", text)) for box, text in [
-            ((310, 80, 550, 130), "right1"), ((50, 140, 290, 180), "left2"),
-            ((50, 20, 550, 50), "heading"), ((50, 80, 290, 130), "left1"),
-            ((310, 140, 550, 180), "right2")]]
-        self.assertEqual([text for _, text in column_order(blocks, 600)],
-                         ["heading", "left1", "left2", "right1", "right2"])
+        with pymupdf.open() as document:
+            pdf_page = document.new_page(width=600, height=500)
+            pdf_page.insert_text((50, 40), "A document with two separate columns", fontsize=18)
+            for start, end, box in [("LEFT_START", "LEFT_END", (50, 80, 285, 300)),
+                                     ("RIGHT_START", "RIGHT_END", (315, 80, 550, 300))]:
+                pdf_page.insert_textbox(box, start + "\n" + "This is a separate paragraph in one column. " * 6 + "\n" + end)
+            text = read_page(pdf_page)["raw"]
+        self.assertLess(text.index("LEFT_START"), text.index("LEFT_END"))
+        self.assertLess(text.index("LEFT_END"), text.index("RIGHT_START"))
+        self.assertLess(text.index("RIGHT_START"), text.index("RIGHT_END"))
 
     def test_legal_subsections_keep_article_and_do_not_mix_penalties(self):
         text = ("Članak 228. - Krađa\n(1) Osnovni oblik: do tri godine.\n"
@@ -85,10 +104,13 @@ class ProcessingTests(unittest.TestCase):
             chunks = make_chunks([read_page(pdf_page)])
         self.assertTrue(any("Product: Monitor" in c["text"] and "Amount: 300.00 EUR" in c["text"] for c in chunks))
 
-    @patch("retrieval.documents.read_image", return_value=("Text inside an image", []))
+    @patch("retrieval.documents.rapidocr_api.exec_ocr",
+           side_effect=lambda target, **kw: target.insert_text((60, 200), "Text inside an image"))
     def test_scanned_and_mixed_pdf_pages_use_ocr(self, ocr):
         image = BytesIO()
-        Image.new("RGB", (400, 200), "white").save(image, format="PNG")
+        picture = Image.new("RGB", (400, 200), "white")
+        ImageDraw.Draw(picture).text((20, 40), "Text inside an image", fill="black", font_size=28)
+        picture.save(image, format="PNG")
         with pymupdf.open() as document:
             pdf_page = document.new_page(width=600, height=600)
             pdf_page.insert_image(pymupdf.Rect(50, 150, 550, 450), stream=image.getvalue())
@@ -198,13 +220,27 @@ class IndexTests(unittest.TestCase):
 
 
 class ToolTests(unittest.TestCase):
-    @patch("tools.search._index")
-    def test_tool_returns_sources_and_uses_the_configured_session(self, get_index):
-        get_index().search.return_value = [dict(filename="penalty.pdf", page_number=2, text="Total: 30 EUR", embedding="private")]
+    def test_tool_returns_sources_and_uses_the_configured_session(self):
+        index = Mock()
+        search_documents = make_search_documents(index=index)
+        index.search.return_value = [dict(filename="penalty.pdf", page_number=2, text="Total: 30 EUR", embedding="private")]
         self.assertEqual(search_documents("total"), "[penalty.pdf, str. 2]\nTotal: 30 EUR")
-        get_index().search.assert_called_once_with("total", session_id=DOCUMENT_SESSION, top_k=3)
-        get_index().search.side_effect = ConnectionError("Ollama unavailable")
+        index.search.assert_called_once_with("total", session_id=DOCUMENT_SESSION, top_k=3)
+        index.search.side_effect = ConnectionError("Ollama unavailable")
         self.assertIn("Document search failed", search_documents("total"))
+
+    def test_model_sees_only_query_and_each_tool_keeps_its_server_session(self):
+        index = Mock()
+        index.search.return_value = []
+        alice, bob = [make_search_documents(scope, index) for scope in ("alice", "bob")]
+        schema = convert_to_openai_tool(alice)["function"]
+        self.assertEqual(schema["name"], "search_documents")
+        self.assertEqual(set(schema["parameters"]["properties"]), {"query"})
+        self.assertIn("Pass the user's full question", schema["description"])
+        self.assertNotIn("Bind the document scope", schema["description"])
+        alice("one question")
+        bob("another question")
+        self.assertEqual([call.kwargs["session_id"] for call in index.search.call_args_list], ["alice", "bob"])
 
 
 if __name__ == "__main__":

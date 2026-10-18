@@ -1,0 +1,33 @@
+Naredbe pokreni iz glavnog foldera projekta. Odaberi Docker ili rucno pokretanje.
+
+DOCKER (Docker Desktop mora raditi)
+docker compose -f compose.yaml -f compose.gpu.yaml up -d --build - Pokretanje/obnova aplikacije uz NVIDIA GPU
+docker compose up -d --build - Alternativno pokretanje bez GPU-a
+docker compose ps - Status servisa
+docker compose logs -f api - Pracenje API logova; Ctrl+C izlazi
+docker compose logs setup - Provjera pripreme modela i dokumenata
+docker compose restart api - Ponovno pokretanje API-ja
+docker compose --profile evaluation stop - Zaustavljanje svih servisa uz cuvanje podataka
+
+RUCNO POKRETANJE (PowerShell; lokalna Ollama mora raditi)
+.\.venv\Scripts\Activate.ps1 - Aktivacija virtualnog okruzenja
+python -m pip install -r requirements.txt - Instalacija Python paketa
+python -m deployment.bootstrap - Priprema modela i primjera dokumenata
+python -m uvicorn api:app --host 127.0.0.1 --port 8000 - Pokretanje API-ja
+python -m streamlit run app.py - Pokretanje sucelja; API mora raditi
+python -m streamlit run monitoring/dashboard.py --server.port 8502 - Pokretanje monitoringa
+python agent.py - Razgovor s agentom u terminalu
+
+TESTOVI I EVALUACIJA
+python -m unittest discover -s tests -v - Lokalni automatizirani testovi
+docker compose exec api python -m unittest discover -s tests -q - Testovi u Dockeru
+docker compose exec ollama ollama pull qwen3.5:9b-q4_K_M - Preuzimanje judge modela
+docker compose -f compose.yaml -f compose.gpu.yaml --profile evaluation up -d --build evaluation - Pokretanje Jupytera uz GPU
+docker compose logs evaluation - Jupyter adresa i pristupni token
+docker compose exec evaluation python -m evaluation.simulations - API simulacije i sigurnosne provjere
+
+ADRESE (zadani portovi)
+http://127.0.0.1:8501 - Razgovor
+http://127.0.0.1:8000/docs - Interaktivna API dokumentacija
+http://127.0.0.1:8502 - Monitoring
+http://127.0.0.1:8888 - Jupyter; token je u logovima
