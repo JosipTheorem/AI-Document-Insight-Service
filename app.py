@@ -48,6 +48,7 @@ try:
         st.session_state.session["messages"] = []
         session_id = st.session_state.session["session_id"]
         st.session_state.upload_key = st.session_state.get("upload_key", 0) + 1
+        st.rerun()
     if session_id not in titles:
         titles = {session_id: "Novi razgovor", **titles}
     # Reset the widget when names/order change; a stale option index must not switch chats.

@@ -11,6 +11,7 @@ from unittest.mock import Mock, patch
 from uuid import uuid4
 
 import numpy as np
+import httpx
 import pymupdf
 from fastapi.testclient import TestClient
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -77,6 +78,12 @@ class ApiTests(unittest.TestCase):
     def documents(self, session):
         return self.client.get("/documents", params={"session_id": session}).json()["documents"]
 
+    def ui_request(self, method, url, **kwargs):
+        kwargs.pop("timeout", None)
+        response = self.client.request(method, url, **kwargs)
+        return httpx.Response(response.status_code, content=response.content, headers=response.headers,
+                              request=httpx.Request(method, url))
+
     def test_conversations_restore_history_context_and_quota_after_restart(self):
         session = self.session()
         other = self.session()
@@ -135,11 +142,7 @@ class ApiTests(unittest.TestCase):
     def test_streamlit_titles_switching_drafts_and_history_stay_in_sync(self):
         from streamlit.testing.v1 import AppTest
 
-        def request(method, url, **kwargs):
-            kwargs.pop("timeout", None)
-            return self.client.request(method, url, **kwargs)
-
-        with patch("httpx.request", side_effect=request) as http:
+        with patch("httpx.request", side_effect=self.ui_request) as http:
             ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
             first = ui.session_state["session"]["session_id"]
             self.assertEqual(ui.sidebar.selectbox[0].options, ["Novi razgovor"])
@@ -153,6 +156,7 @@ class ApiTests(unittest.TestCase):
             ui.sidebar.button[0].click().run(timeout=20)
             second = ui.session_state["session"]["session_id"]
             self.assertNotEqual(second, first)
+            self.assertTrue(ui.sidebar.button[0].disabled)
             ui.run(timeout=20)
             self.assertTrue(ui.sidebar.button[0].disabled)
             self.assertEqual(ui.sidebar.selectbox[0].options, ["Novi razgovor", "hej"])
@@ -178,7 +182,6 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(len(self.client.get(f"/sessions/{second}").json()["messages"]), 2)
 
     def test_streamlit_recovers_missing_sessions_but_keeps_session_on_server_errors(self):
-        import httpx
         from streamlit.testing.v1 import AppTest
 
         saved = self.session()
@@ -189,10 +192,7 @@ class ApiTests(unittest.TestCase):
             if unavailable and method == "GET" and "/sessions/" in url:
                 return httpx.Response(503, json={"detail": "Temporarily unavailable"},
                                       request=httpx.Request(method, url))
-            kwargs.pop("timeout", None)
-            response = self.client.request(method, url, **kwargs)
-            return httpx.Response(response.status_code, content=response.content, headers=response.headers,
-                                  request=httpx.Request(method, url))
+            return self.ui_request(method, url, **kwargs)
 
         with patch("httpx.request", side_effect=request):
             ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
@@ -230,6 +230,27 @@ class ApiTests(unittest.TestCase):
             ui.chat_input[0].set_value("Hello after recovery").run(timeout=20)
             self.assertEqual(len(ui.chat_message), 2)
             self.assertEqual(ui.session_state["session"]["messages_used"], 1)
+
+    def test_streamlit_upload_and_duplicate_are_visible_and_searchable(self):
+        from streamlit.testing.v1 import AppTest
+
+        uploaded = Mock()
+        uploaded.name, uploaded.type = "ui-upload.pdf", "application/pdf"
+        uploaded.getvalue.return_value = pdf_bytes("Document penalty is 42 EUR.")
+        with patch("httpx.request", side_effect=self.ui_request), patch("streamlit.file_uploader", return_value=uploaded):
+            ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
+            scope = ui.session_state["session"]["session_id"]
+            ui.sidebar.button[1].click().run(timeout=20)
+            self.assertFalse(ui.exception)
+            self.assertTrue(ui.success)
+            self.assertEqual(len(self.documents(scope)), 1)
+            self.assertEqual(ui.sidebar.selectbox[0].options, ["Dokument: ui-upload.pdf"])
+            ui.sidebar.button[1].click().run(timeout=20)
+            self.assertIn("već dostupan", ui.success[0].value)
+            self.assertEqual(len(self.documents(scope)), 1)
+            ui.chat_input[0].set_value("What penalty is stated?").run(timeout=20)
+            self.assertEqual(len(ui.chat_message), 2)
+            self.assertIn("42 EUR", ui.chat_message[1].markdown[0].value)
 
     def test_upload_is_immediately_searchable_and_sessions_are_isolated(self):
         alice, bob = self.session(), self.session()
@@ -305,6 +326,30 @@ class ApiTests(unittest.TestCase):
         events = [json.loads(line) for line in (Path(self.temporary.name) / "events.txt").read_text(encoding="utf-8").splitlines()]
         self.assertTrue(any(row["event"] == "agent_error" and row["error_type"] == "ConnectionError" for row in events))
 
+    def test_failed_turn_does_not_survive_in_agent_context_after_recovery(self):
+        original = SearchModel._generate
+        for fail_after_search in (False, True):
+            scope = self.session()
+            self.ask(scope, "Saved question")
+
+            def fail(model, messages, **kwargs):
+                if not fail_after_search or messages[-1].type == "tool":
+                    raise ConnectionError("Model unavailable")
+                return original(model, messages, **kwargs)
+
+            with patch.object(SearchModel, "_generate", fail):
+                self.assertEqual(self.ask(scope, "Failed question").status_code, 503)
+            recovered = self.ask(scope, "Successful retry")
+            self.assertEqual(recovered.status_code, 200)
+            self.assertEqual(recovered.json()["messages_used"], 3)
+            with self.index.connection() as db:
+                saved = db.execute("SELECT state_json FROM conversation_turns WHERE session_id=? ORDER BY id DESC LIMIT 1",
+                                   (scope,)).fetchone()
+            context = [message["data"]["content"] for message in json.loads(saved["state_json"]) if message["type"] == "human"]
+            visible = self.client.get(f"/sessions/{scope}").json()["messages"]
+            self.assertEqual(context, ["Saved question", "Successful retry"])
+            self.assertEqual(context, [message["content"] for message in visible if message["role"] == "user"])
+
     def test_empty_model_output_retries_and_saves_only_the_recovered_answer(self):
         session = self.session()
         responses = [ChatResult(generations=[ChatGeneration(message=message)]) for message in (
@@ -375,11 +420,7 @@ class ApiTests(unittest.TestCase):
     def test_streamlit_sends_http_for_session_and_chat(self):
         from streamlit.testing.v1 import AppTest
 
-        def request(method, url, **kwargs):
-            kwargs.pop("timeout", None)
-            return self.client.request(method, url, **kwargs)
-
-        with patch("httpx.request", side_effect=request) as http:
+        with patch("httpx.request", side_effect=self.ui_request) as http:
             ui = AppTest.from_file(str(PROJECT_ROOT / "app.py")).run(timeout=20)
             self.assertFalse(ui.exception)
             first_session = ui.session_state["session"]["session_id"]

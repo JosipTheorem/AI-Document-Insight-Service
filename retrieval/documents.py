@@ -39,8 +39,9 @@ def read_page(page):
     for box in result["pages"][0]["boxes"]:
         if box["table"]:
             rows = box["table"]["extract"]
-            header = rows[0]
-            text = "\n".join("; ".join(f"{h or 'Column'}: {v or ''}" for h, v in zip(header, row)) for row in rows[1:])
+            # Keep every row: the first row is not necessarily a header.
+            text = "\n".join(f"Row {i}: " + " | ".join(str(cell or "") for cell in row)
+                             for i, row in enumerate(rows, 1))
             kind = "table"
         else:
             text = "\n".join("".join(span["text"] for span in line["spans"]) for line in box["textlines"] or [])
@@ -88,7 +89,7 @@ def make_chunks(pages, size=CHUNK_WORDS, overlap=OVERLAP_WORDS):
                     sections.append(("text", "\n\n".join(pending)))
                     pending = []
                 if kind == "table":
-                    sections += [("table", line) for line in lines if line.strip()]
+                    sections.append(("table", raw))
                 else:
                     heading = " ".join(" ".join(lines[:starts[0]]).split()[-40:])
                     sections += [("list", heading + "\n" + "\n".join(lines[a:b]))
@@ -101,7 +102,7 @@ def make_chunks(pages, size=CHUNK_WORDS, overlap=OVERLAP_WORDS):
         for kind, text in sections:
             parts = re.split(r"(?m)(?=^Članak \d+\.|^Izvori i važna napomena)", text)
             for part in parts:
-                if re.match(r"Članak \d+\.", part):
+                if re.match(r"Članak \d+\.", part) and "\n" in part.rstrip():
                     heading, _, body = part.partition("\n")
                     clauses = re.split(r"(?m)(?=^\(\d+\)\s)", body)
                     focused.extend((kind, heading + "\n" + clause) for clause in clauses if clause.strip())

@@ -36,6 +36,7 @@ or the send button. Previous conversations are available in the sidebar.
 Each session allows ten requests, including refused or failed attempts.
 
 Example questions are in [data/files/questions.txt](data/files/questions.txt).
+Useful commands, including SQLite inspection, are in [commands.txt](commands.txt).
 The examples are simplified Croatian legal test excerpts: two topics represented
 as text PDFs, scanned PDFs and PNGs. They are not current legal advice.
 Source and reuse information is in [data/files/ORIGIN.md](data/files/ORIGIN.md).

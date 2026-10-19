@@ -26,6 +26,17 @@ docker compose -f compose.yaml -f compose.gpu.yaml --profile evaluation up -d --
 docker compose logs evaluation - Jupyter adresa i pristupni token
 docker compose exec evaluation python -m evaluation.simulations - API simulacije i sigurnosne provjere
 
+SQLITE (Docker baza; prvo otvori konzolu, zatim upisuj SQL)
+docker compose exec api python -m sqlite3 /app/data/runtime/index.sqlite3 - Otvaranje SQL konzole
+SELECT name FROM sqlite_master WHERE type='table'; - Popis tablica
+PRAGMA table_info(chunks); - Stupci tablice chunks
+SELECT id, session_id, filename FROM documents; - Dokumenti i njihove sesije
+SELECT id, document_id, page_number, text FROM chunks LIMIT 10; - Prvih 10 chunkova
+SELECT id, text FROM chunks WHERE text LIKE '%kazna%' LIMIT 10; - Pretraga teksta; zamijeni kazna svojim pojmom
+SELECT session_id, question, answer FROM conversation_turns ORDER BY id DESC LIMIT 5; - Zadnjih 5 poruka
+.quit - Izlaz iz SQL konzole
+python -m sqlite3 data/runtime/index.sqlite3 - Lokalna baza kod rucnog pokretanja
+
 ADRESE (zadani portovi)
 http://127.0.0.1:8501 - Razgovor
 http://127.0.0.1:8000/docs - Interaktivna API dokumentacija

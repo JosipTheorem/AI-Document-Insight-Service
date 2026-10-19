@@ -145,6 +145,16 @@ def create_app(index=None):
                 "message_limit": MAX_SESSION_MESSAGES,
                 "notice": SESSION_LIMIT_MESSAGE if used >= MAX_SESSION_MESSAGES else None}
 
+    def load_agent(key):
+        agent = build_agent(key, index)
+        with index.connection() as db:
+            saved = db.execute("SELECT state_json FROM conversation_turns WHERE session_id=? "
+                               "ORDER BY id DESC LIMIT 1", (key,)).fetchone()
+        if saved:
+            agent.update_state({"configurable": {"thread_id": key}},
+                               {"messages": messages_from_dict(json.loads(saved["state_json"]))})
+        return agent
+
     def get_session(session_id):
         key = str(session_id)
         bind_session(key)
@@ -153,14 +163,7 @@ def create_app(index=None):
                 if not db.execute("SELECT 1 FROM api_sessions WHERE id=?", (key,)).fetchone():
                     raise HTTPException(404, "Sesija ne postoji. Započni novi razgovor.")
             if key not in sessions:
-                agent = build_agent(key, index)
-                with index.connection() as db:
-                    saved = db.execute("SELECT state_json FROM conversation_turns WHERE session_id=? "
-                                       "ORDER BY id DESC LIMIT 1", (key,)).fetchone()
-                if saved:
-                    agent.update_state({"configurable": {"thread_id": key}},
-                                       {"messages": messages_from_dict(json.loads(saved["state_json"]))})
-                sessions[key] = Session(agent)
+                sessions[key] = Session(load_agent(key))
             return sessions[key]
 
     @app.get("/health")
@@ -259,23 +262,28 @@ def create_app(index=None):
                 if not reserved:
                     log_event("session_limit_reached", level="WARNING")  #logging
                     raise HTTPException(429, SESSION_LIMIT_MESSAGE)
-                result = session.agent.invoke(
-                    {"messages": [{"role": "user", "content": request.message}]},
-                    config={"configurable": {"thread_id": session_id}, "recursion_limit": 20},
-                )
-                answer = result["messages"][-1].text
-                if not answer.strip():
-                    raise RuntimeError("Agent returned an empty answer")
-                evidence = {source for message in result["messages"] if isinstance(message, ToolMessage)
-                            and message.name == "search_documents" for source in CITATION.findall(message.text)}
-                sources = [Source(filename=name, page_number=int(page)) for name, page in
-                           dict.fromkeys(CITATION.findall(answer)) if (name, page) in evidence]
-                with index.connection() as db:
-                    db.execute("INSERT INTO conversation_turns(session_id, question, answer, state_json) VALUES(?,?,?,?)",
-                               (session_id, request.message, answer, json.dumps(messages_to_dict(result["messages"]))))
-                stats = usage(session_id)
-                log_event("agent_completed", sources=len(sources), **stats)  #logging
-                return AskResponse(session_id=request.session_id, answer=answer, sources=sources, **stats)
+                try:
+                    result = session.agent.invoke(
+                        {"messages": [{"role": "user", "content": request.message}]},
+                        config={"configurable": {"thread_id": session_id}, "recursion_limit": 20},
+                    )
+                    answer = result["messages"][-1].text
+                    if not answer.strip():
+                        raise RuntimeError("Agent returned an empty answer")
+                    evidence = {source for message in result["messages"] if isinstance(message, ToolMessage)
+                                and message.name == "search_documents" for source in CITATION.findall(message.text)}
+                    sources = [Source(filename=name, page_number=int(page)) for name, page in
+                               dict.fromkeys(CITATION.findall(answer)) if (name, page) in evidence]
+                    with index.connection() as db:
+                        db.execute("INSERT INTO conversation_turns(session_id, question, answer, state_json) VALUES(?,?,?,?)",
+                                   (session_id, request.message, answer, json.dumps(messages_to_dict(result["messages"]))))
+                    stats = usage(session_id)
+                    log_event("agent_completed", sources=len(sources), **stats)  #logging
+                    return AskResponse(session_id=request.session_id, answer=answer, sources=sources, **stats)
+                except Exception:
+                    # Discard unfinished graph steps before another request can use this session.
+                    session.agent = load_agent(session_id)
+                    raise
         except HTTPException:
             raise
         except Exception as error:

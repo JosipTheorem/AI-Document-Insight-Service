@@ -142,28 +142,40 @@ class Index:
         if old and old["pipeline_id"] == PIPELINE_ID and not force:
             return dict(status="unchanged", document_id=old["id"], filename=old["filename"])
         snapshot = self.path.parent / "documents" / f"{digest}{path.suffix.lower()}"
-        snapshot.parent.mkdir(exist_ok=True)
-        snapshot.write_bytes(payload)
-        pages = extract(snapshot)
+        pages = extract(path)
         chunks = make_chunks(pages)
         if not chunks:
             raise ValueError("No readable text found.")
         vectors = normalize(self.embed([chunk["text"] for chunk in chunks]))
         document_id = old["id"] if old else str(uuid4())
-        with self.connection() as db:
-            meta = db.execute("SELECT * FROM index_meta").fetchone()
-            if meta and (meta["model_id"] != self.model_id or meta["dimension"] != vectors.shape[1]):
-                raise ValueError("Embedding model/dimension differs from the index.")
-            db.execute("INSERT OR IGNORE INTO index_meta VALUES(1,?,?)", (self.model_id, vectors.shape[1]))
-            db.execute("DELETE FROM documents WHERE id=?", (document_id,))
-            db.execute("INSERT INTO documents(id,session_id,filename,content_hash,stored_path,pipeline_id) VALUES(?,?,?,?,?,?)",
-                       (document_id, session_id, path.name, digest, snapshot.relative_to(self.path.parent).as_posix(), PIPELINE_ID))
-            db.executemany("INSERT INTO pages VALUES(?,?,?,?,?,?,?)", [
-                (document_id, p["number"], p["raw"], clean_text("\n\n".join(text for _, text in p["blocks"])),
-                 p["method"], json.dumps(p["blocks"], ensure_ascii=False), json.dumps(p["warnings"])) for p in pages])
-            db.executemany("INSERT INTO chunks(document_id,page_number,ordinal,text,kind,embedding) VALUES(?,?,?,?,?,?)", [
-                (document_id, c["page_number"], i, c["text"], c["kind"], v.astype("<f4").tobytes())
-                for i, (c, v) in enumerate(zip(chunks, vectors, strict=True))])
+        created_snapshot = False
+        stored_path = snapshot.relative_to(self.path.parent).as_posix()
+        try:
+            with self.connection() as db:
+                meta = db.execute("SELECT * FROM index_meta").fetchone()
+                if meta and (meta["model_id"] != self.model_id or meta["dimension"] != vectors.shape[1]):
+                    raise ValueError("Embedding model/dimension differs from the index.")
+                db.execute("INSERT OR IGNORE INTO index_meta VALUES(1,?,?)", (self.model_id, vectors.shape[1]))
+                db.execute("DELETE FROM documents WHERE id=?", (document_id,))
+                db.execute("INSERT INTO documents(id,session_id,filename,content_hash,stored_path,pipeline_id) VALUES(?,?,?,?,?,?)",
+                           (document_id, session_id, path.name, digest, stored_path, PIPELINE_ID))
+                db.executemany("INSERT INTO pages VALUES(?,?,?,?,?,?,?)", [
+                    (document_id, p["number"], p["raw"], clean_text("\n\n".join(text for _, text in p["blocks"])),
+                     p["method"], json.dumps(p["blocks"], ensure_ascii=False), json.dumps(p["warnings"])) for p in pages])
+                db.executemany("INSERT INTO chunks(document_id,page_number,ordinal,text,kind,embedding) VALUES(?,?,?,?,?,?)", [
+                    (document_id, c["page_number"], i, c["text"], c["kind"], v.astype("<f4").tobytes())
+                    for i, (c, v) in enumerate(zip(chunks, vectors, strict=True))])
+                if not snapshot.exists():
+                    snapshot.parent.mkdir(exist_ok=True)
+                    created_snapshot = True
+                    snapshot.write_bytes(payload)
+        except Exception:
+            if created_snapshot:
+                with self.connection() as db:
+                    db.execute("BEGIN IMMEDIATE")
+                    if not db.execute("SELECT 1 FROM documents WHERE stored_path=?", (stored_path,)).fetchone():
+                        snapshot.unlink(missing_ok=True)
+            raise
         return dict(status="indexed", document_id=document_id, filename=path.name, pages=len(pages), chunks=len(chunks),
                     warnings=[note for page in pages for note in page["warnings"]])
 

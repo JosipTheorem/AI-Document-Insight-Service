@@ -49,6 +49,15 @@ class ProcessingTests(unittest.TestCase):
         self.assertIn("Speed", chunks[0]["text"])
         self.assertNotIn("Alcohol", chunks[0]["text"])
 
+    def test_inline_legal_articles_are_not_discarded(self):
+        text = "Članak 5. Iznos je 100 EUR."
+        for kind in ("text", "ocr"):
+            for ending in ("", "\n", "\n\nČlanak 6. Rok je 30 dana."):
+                chunks = make_chunks([page(text + ending, kind=kind)])
+                self.assertIn(text, " ".join(chunk["text"] for chunk in chunks))
+                if "Članak 6." in ending:
+                    self.assertTrue(any("Članak 6. Rok je 30 dana." in c["text"] for c in chunks))
+
     def test_multi_page_pdf_keeps_text_and_page_attribution(self):
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "two-pages.pdf"
@@ -89,20 +98,27 @@ class ProcessingTests(unittest.TestCase):
             self.assertNotIn("Razbojništvo", " ".join(theft))
             self.assertFalse(any("Izvori" in c["text"] for c in chunks if c["text"].startswith("Članak")))
 
-    def test_real_pdf_table_preserves_column_labels(self):
-        with pymupdf.open() as document:
-            pdf_page = document.new_page(width=600, height=400)
-            rows = [["Product", "Quantity", "Amount"], ["Monitor", "2", "300.00 EUR"], ["Keyboard", "1", "50.00 EUR"]]
-            xs, ys = [50, 240, 340, 520], [80, 125, 170, 215]
-            for x in xs:
-                pdf_page.draw_line((x, ys[0]), (x, ys[-1]))
-            for y in ys:
-                pdf_page.draw_line((xs[0], y), (xs[-1], y))
-            for r, row in enumerate(rows):
-                for c, text in enumerate(row):
-                    pdf_page.insert_text((xs[c] + 8, ys[r] + 25), text)
-            chunks = make_chunks([read_page(pdf_page)])
-        self.assertTrue(any("Product: Monitor" in c["text"] and "Amount: 300.00 EUR" in c["text"] for c in chunks))
+    def test_real_pdf_tables_keep_rows_with_or_without_headers(self):
+        products = [["Monitor", "2", "300.00 EUR"], ["Keyboard", "1", "50.00 EUR"], ["Mouse", "3", "20.00 EUR"]]
+        for header in (True, False):
+            rows = ([["Product", "Quantity", "Amount"]] if header else []) + products
+            with pymupdf.open() as document:
+                pdf_page = document.new_page(width=600, height=400)
+                xs, ys = [50, 240, 340, 520], [80 + i * 45 for i in range(len(rows) + 1)]
+                for x in xs:
+                    pdf_page.draw_line((x, ys[0]), (x, ys[-1]))
+                for y in ys:
+                    pdf_page.draw_line((xs[0], y), (xs[-1], y))
+                for r, row in enumerate(rows):
+                    for c, text in enumerate(row):
+                        pdf_page.insert_text((xs[c] + 8, ys[r] + 25), text)
+                chunks = make_chunks([read_page(pdf_page)])
+            text = " ".join(c["text"] for c in chunks)
+            for product in products:
+                self.assertIn(" | ".join(product), text)
+            if header:
+                self.assertTrue(any("Product | Quantity | Amount" in c["text"] and "Monitor | 2 | 300.00 EUR" in c["text"]
+                                    for c in chunks))
 
     @patch("retrieval.documents.rapidocr_api.exec_ocr",
            side_effect=lambda target, **kw: target.insert_text((60, 200), "Text inside an image"))
@@ -197,6 +213,37 @@ class IndexTests(unittest.TestCase):
             self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks").fetchone()[0], 1)
             self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks_fts WHERE chunks_fts MATCH 'penalty'").fetchone()[0], 1)
             self.assertEqual(db.execute("PRAGMA foreign_key_check").fetchall(), [])
+
+    def test_failed_processing_does_not_leave_new_document_copies(self):
+        self.ingest()
+        copies = list((self.root / "documents").iterdir())
+        self.index.embed.side_effect = ConnectionError("Ollama unavailable")
+        with self.assertRaises(ConnectionError):
+            self.ingest("failed.pdf", "A different penalty is 50 EUR.")
+        with self.assertRaises(ValueError):
+            self.ingest("blank.pdf", "  ")
+        with patch("retrieval.index.extract", side_effect=RuntimeError("Parser failed")):
+            with self.assertRaises(RuntimeError):
+                self.ingest("broken.pdf", "Another document.")
+        self.assertEqual(list((self.root / "documents").iterdir()), copies)
+        self.assertEqual(len(self.index.documents("alice")), 1)
+
+    def test_snapshot_write_failure_rolls_back_and_removes_partial_copy(self):
+        source = self.root / "document.pdf"
+        source.write_text("Penalty is 100 EUR.")
+        write_bytes = Path.write_bytes
+
+        def fail_copy(path, payload):
+            write_bytes(path, payload[:5])
+            raise OSError("Disk write failed")
+
+        with patch.object(Path, "write_bytes", fail_copy):
+            with self.assertRaises(OSError):
+                self.index.ingest(source, "alice")
+        self.assertEqual(self.index.documents("alice"), [])
+        self.assertEqual(list((self.root / "documents").iterdir()), [])
+        with self.index.connection() as db:
+            self.assertEqual(db.execute("SELECT COUNT(*) FROM chunks").fetchone()[0], 0)
 
     def test_bad_inputs_and_model_mismatch_are_rejected(self):
         with self.assertRaises(ValueError):
